@@ -4,9 +4,9 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from app.models import User
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[Length(min=4, max=25, 
-                            message='Username length must be in range from 4 to 25 characters'),
-                            DataRequired(message='This area is required'), Regexp('[A-Za-z][A-Za-z0-9_.]*$', 0, 'Unexpected charachter in username')])
+    nickname = StringField('nickname', validators=[Length(min=4, max=25, 
+                            message='nickname length must be in range from 4 to 25 characters'),
+                            DataRequired(message='This area is required'), Regexp('[A-Za-z][A-Za-z0-9_.]*$', 0, 'Unexpected charachter in nickname')])
 
     email = StringField('Email', validators=[DataRequired(), Email()])
 
@@ -23,9 +23,9 @@ class RegistrationForm(FlaskForm):
         if User.query.filter_by(email=field.data).first():
             raise ValidationError('Email already registered.')
     
-    def validate_username(self, field):
-        if User.query.filter_by(username=field.data).first():
-            raise ValidationError('Username already in use.')
+    def validate_nickname(self, field):
+        if User.query.filter_by(nickname=field.data).first():
+            raise ValidationError('nickname already in use.')
 
 
 class LoginForm(FlaskForm):
