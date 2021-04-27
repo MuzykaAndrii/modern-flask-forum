@@ -5,3 +5,5 @@ to execute the following project on your pc u need:
 - initialize new virtual env using cli command: python -m venv env
 - activate your empty environment using: env\Scripts\activate
 - install all reqs from file "requirements.txt" using command: pip install -r requirements.txt
+- run project: falsk run
+- to run with development mode set env variable "FLASK_ENV" to "development". On powershell cli command looks like: $env:FLASK_ENV = "development"
