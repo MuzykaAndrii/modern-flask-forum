@@ -52,4 +52,4 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     text = db.Column(db.Text, unique=True, nullable=False)
     written_at = db.Column(db.DateTime, default=dt.utcnow)
-    # creator id property
+    # creator id prop
