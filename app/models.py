@@ -30,3 +30,26 @@ class User(UserMixin, db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+
+class Section(db.Model):
+    id = db.Column(db.Integer, primary_key = True, autoincrement=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    # themes prop, bounded with next model
+
+class Theme(db.Model):
+    id = db.Column(db.Integer, primary_key = True, autoincrement=True)
+    name = db.Column(db.String(150), unique=True, nullable=False)
+    # discussions prop, bounded with next model primary key
+
+class Discussion(db.Model):
+    id = db.Column(db.Integer, primary_key = True, autoincrement=True)
+    theme = db.Column(db.Text, unique=True, nullable=False)
+    # tags prop, reference to future tag model
+    # comments prop, bound with next model primary key
+    # creator id, links this model with creator
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key = True, autoincrement=True)
+    text = db.Column(db.Text, unique=True, nullable=False)
+    written_at = db.Column(db.DateTime, default=dt.utcnow)
+    # creator id property
