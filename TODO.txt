@@ -1,0 +1,13 @@
+ - implement edit requests model
+
+ - implement Image model
+    - add avatars property to User model
+    - link Image model with avatar property
+    - create folders for avatars
+    - implement method to delete all user images
+    - create form for downloading avatar
+
+- implement Tag model
+    - implement association table for many to many relationship
+    - link them with discussions (largest part)
+    - implement some additional methods to easy fetch certain tag
