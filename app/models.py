@@ -83,6 +83,9 @@ class Section(DbMixin, db.Model):
     # themes prop, bound with next model
     themes = db.relationship('Theme', backref='parent_section', lazy='dynamic')
 
+    # saves all tags from this section
+    tags = db.relationship('Tag', backref='parent_section', lazy='dynamic')
+
     def __init__(self, name):
         self.name = name
 
@@ -138,3 +141,10 @@ class Comment(DbMixin, db.Model):
         self.text = text
         self.discussion_id = discussion_id
         self.creator_id = creator_id
+
+class Tag(DbMixin, db.Model):
+    id = db.Column(db.Integer, primary_key = True, autoincrement=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+
+    # defines belonging to certain section
+    section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
