@@ -35,7 +35,7 @@ def register():
 ####### LOGIN
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    #redirect if loggined
+    #redirect if loginned
     if current_user.is_authenticated:
         return redirect(url_for('index'))
 

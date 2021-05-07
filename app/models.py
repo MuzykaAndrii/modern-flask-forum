@@ -31,6 +31,9 @@ class User(UserMixin, DbMixin, db.Model):
     # created comments
     created_comments = db.relationship('Comment', backref='creator', lazy='dynamic')
 
+    # user photos
+    avatars = db.relationship('Image', backref='owner', lazy='select')
+
     def __init__(self, nickname, email, password):
         self.nickname = nickname
         self.email = email
@@ -44,6 +47,20 @@ class User(UserMixin, DbMixin, db.Model):
 
     def __repr__(self):
         return f"User: '{self.nickname}', id: '{self.id}'"
+    
+class Image(DbMixin, db.Model):
+    id = db.Column(db.Integer, primary_key = True, autoincrement=True)
+    path = db.Column(db.String, unique=True, nullable=False)
+
+    # links this model with user
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __init__(self, user_id, path):
+        self.user_id = user_id
+        self.path = path
+    
+    def __repr__(self):
+        return f"Path: '{self.path}', owner: '{self.user_id}'"
 
 
 class Section(DbMixin, db.Model):
