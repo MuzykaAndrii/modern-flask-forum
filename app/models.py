@@ -16,6 +16,12 @@ class User(UserMixin, db.Model):
     about = db.Column(db.Text, default='Hi everyone!')
     last_seen = db.Column(db.DateTime, default=dt.utcnow)
 
+    # created discussions
+    created_discussions = db.relationship('Discussion', backref='creator', lazy='dynamic')
+
+    # created comments
+    created_comments = db.relationship('Comment', backref='creator', lazy='dynamic')
+
     def __init__(self, nickname, email, password):
         self.nickname = nickname
         self.email = email
@@ -34,22 +40,44 @@ class User(UserMixin, db.Model):
 class Section(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
-    # themes prop, bounded with next model
+
+    # themes prop, bound with next model
+    themes = db.relationship('Theme', backref='parent_section', lazy='dynamic')
 
 class Theme(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String(150), unique=True, nullable=False)
-    # discussions prop, bounded with next model primary key
+
+    # field needed to link this model with parent section
+    section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
+
+    # discussions prop, bound with next model primary key
+    discussions = db.relationship('Discussion', backref='parent_theme', lazy='dynamic')
 
 class Discussion(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     theme = db.Column(db.Text, unique=True, nullable=False)
+
+    # field needed to link this model with parent section
+    theme_id = db.Column(db.Integer, db.ForeignKey('theme.id'), nullable=False)
+
+    #
     # tags prop, reference to future tag model
+    #
+
     # comments prop, bound with next model primary key
+    comments = db.relationship('Comment', backref='parent_discussion', lazy='dynamic')
+
     # creator id, links this model with creator
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     text = db.Column(db.Text, unique=True, nullable=False)
     written_at = db.Column(db.DateTime, default=dt.utcnow)
+
+    # field needed to link this model with parent section
+    discussion_id = db.Column(db.Integer, db.ForeignKey('discussion.id'), nullable=False)
+
     # creator id prop
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 72cc7ba948a8
-Revises: 9347a9b4aa7a
-Create Date: 2021-05-07 02:44:39.707565
+Revision ID: b1175d0cfb54
+Revises: a9295b1221c7
+Create Date: 2021-05-07 04:04:14.630729
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '72cc7ba948a8'
-down_revision = '9347a9b4aa7a'
+revision = 'b1175d0cfb54'
+down_revision = 'a9295b1221c7'
 branch_labels = None
 depends_on = None
 
@@ -22,26 +22,26 @@ def upgrade():
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('text', sa.Text(), nullable=False),
     sa.Column('written_at', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('text')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_comment')),
+    sa.UniqueConstraint('text', name=op.f('uq_comment_text'))
     )
     op.create_table('discussion',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('theme', sa.Text(), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('theme')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_discussion')),
+    sa.UniqueConstraint('theme', name=op.f('uq_discussion_theme'))
     )
     op.create_table('section',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_section')),
+    sa.UniqueConstraint('name', name=op.f('uq_section_name'))
     )
     op.create_table('theme',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=150), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_theme')),
+    sa.UniqueConstraint('name', name=op.f('uq_theme_name'))
     )
     # ### end Alembic commands ###
 
