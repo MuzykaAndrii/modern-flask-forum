@@ -8,7 +8,16 @@ from app import bcrypt
 def user_loader(user_id):
     return User.query.get(int(user_id))
 
-class User(UserMixin, db.Model):
+class DbMixin(object):
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+class User(UserMixin, DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     nickname = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -33,18 +42,22 @@ class User(UserMixin, db.Model):
     def check_password(self, candidate):
         return bcrypt.check_password_hash(self.password, candidate)
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
+    def __repr__(self):
+        return f"User: '{self.nickname}', id: '{self.id}'"
 
-class Section(db.Model):
+
+class Section(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
 
     # themes prop, bound with next model
     themes = db.relationship('Theme', backref='parent_section', lazy='dynamic')
 
-class Theme(db.Model):
+    def __init__(self, name):
+        self.name = name
+
+
+class Theme(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String(150), unique=True, nullable=False)
 
@@ -54,7 +67,11 @@ class Theme(db.Model):
     # discussions prop, bound with next model primary key
     discussions = db.relationship('Discussion', backref='parent_theme', lazy='dynamic')
 
-class Discussion(db.Model):
+    def __init__(self, name, section_id):
+        self.name = name
+        self.section_id = section_id
+
+class Discussion(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     theme = db.Column(db.Text, unique=True, nullable=False)
 
@@ -71,7 +88,12 @@ class Discussion(db.Model):
     # creator id, links this model with creator
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-class Comment(db.Model):
+    def __init__(self, theme, theme_id, creator_id):
+        self.theme = theme
+        self.theme_id = theme_id
+        self.creator_id = creator_id
+
+class Comment(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     text = db.Column(db.Text, unique=True, nullable=False)
     written_at = db.Column(db.DateTime, default=dt.utcnow)
@@ -81,3 +103,8 @@ class Comment(db.Model):
 
     # creator id prop
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __init__(self, text, discussion_id, creator_id):
+        self.text = text
+        self.discussion_id = discussion_id
+        self.creator_id = creator_id
