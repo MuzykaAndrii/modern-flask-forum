@@ -18,6 +18,12 @@ class DbMixin(object):
         db.session.delete(self)
         db.session.commit()
 
+
+discussion_tags = db.Table('discussion_tags', 
+                            db.Column('discussion_id', db.Integer, db.ForeignKey('discussion.id'), nullable=False),
+                            db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), nullable=False)
+    )
+
 class User(UserMixin, DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     nickname = db.Column(db.String(20), unique=True, nullable=False)
@@ -113,7 +119,7 @@ class Discussion(DbMixin, db.Model):
 
     #
     # tags prop, reference to future tag model
-    #
+    tags = db.relationship('Tag', secondary=discussion_tags, backref=db.backref('discussions', lazy='dynamic'))
 
     # comments prop, bound with next model primary key
     comments = db.relationship('Comment', backref='parent_discussion', lazy='dynamic')
@@ -148,3 +154,4 @@ class Tag(DbMixin, db.Model):
 
     # defines belonging to certain section
     section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
+
