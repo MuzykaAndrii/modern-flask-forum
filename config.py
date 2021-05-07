@@ -14,5 +14,9 @@ metadata = MetaData(naming_convention=convention)
 WTF_CSRF_ENABLED = True
 SECRET_KEY = 'SuperSecretString'
 
+USERS_PICS_DIR = '/static/images/users_avatars/'
+FILENAME_LENGTH = 8
+USERS_PICS_SIZE = (500, 500)
+
 SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'site.db')
 SQLALCHEMY_TRACK_MODIFICATIONS = False

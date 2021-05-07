@@ -3,6 +3,7 @@ from datetime import datetime as dt
 from flask_login import UserMixin, current_user
 from app import login
 from app import bcrypt
+from utils.image_handler import *
 
 @login.user_loader
 def user_loader(user_id):
@@ -48,19 +49,31 @@ class User(UserMixin, DbMixin, db.Model):
     def __repr__(self):
         return f"User: '{self.nickname}', id: '{self.id}'"
     
-class Image(DbMixin, db.Model):
+class Image(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
-    path = db.Column(db.String, unique=True, nullable=False)
+    name = db.Column(db.String, unique=True, nullable=False)
 
     # links this model with user
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    def __init__(self, user_id, path):
+    def __init__(self, user_id, form_image):
         self.user_id = user_id
-        self.path = path
+        self.name = gen_filename(form_image.filename, app.config['FILENAME_LENGTH'])
+    
+    def save(self, form_image):
+        save_picture(form_image, app.root_path + app.config['USERS_PICS_DIR'], app.config['USERS_PICS_SIZE'])
+
+        db.session.add(self)
+        db.session.commit()
+    
+    def delete(self):
+        delete_file(app.root_path + app.config['USERS_PICS_DIR'] + self.name)
+
+        db.session.delete(self)
+        db.session.commit()
     
     def __repr__(self):
-        return f"Path: '{self.path}', owner: '{self.user_id}'"
+        return f"Path: '{self.name}', owner: '{self.user_id}'"
 
 
 class Section(DbMixin, db.Model):
