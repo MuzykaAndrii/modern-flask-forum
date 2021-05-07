@@ -53,7 +53,7 @@ class User(UserMixin, DbMixin, db.Model):
         return bcrypt.check_password_hash(self.password, candidate)
 
     def __repr__(self):
-        return f"User: '{self.nickname}', id: '{self.id}'"
+        return f"<User: '{self.nickname}', id: '{self.id}'>"
     
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
@@ -67,7 +67,7 @@ class Image(db.Model):
         self.name = gen_filename(form_image.filename, app.config['FILENAME_LENGTH'])
     
     def save(self, form_image):
-        save_picture(form_image, app.root_path + app.config['USERS_PICS_DIR'], app.config['USERS_PICS_SIZE'])
+        save_picture(form_image, self.name, app.root_path + app.config['USERS_PICS_DIR'], app.config['USERS_PICS_SIZE'])
 
         db.session.add(self)
         db.session.commit()
@@ -79,7 +79,7 @@ class Image(db.Model):
         db.session.commit()
     
     def __repr__(self):
-        return f"Path: '{self.name}', owner: '{self.user_id}'"
+        return f"<Path: '{self.name}', owner: '{self.user_id}'>"
 
 
 class Section(DbMixin, db.Model):
@@ -154,4 +154,11 @@ class Tag(DbMixin, db.Model):
 
     # defines belonging to certain section
     section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
+
+    def __init__(self, name, section_id):
+        self.name = name
+        self.section_id = section_id
+    
+    def __repr__(self):
+        return f"<Tag: '{self.name}', father section: '{self.section_id}', id: '{self.id}'>"
 

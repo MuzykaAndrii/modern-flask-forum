@@ -9,9 +9,9 @@
 - implement Tag model
     - implement association table for many to many relationship
     - link them with discussions (largest part)
+    - implement some additional methods to easy fetch certain tag
+
 
 ------------------------------DONE-------------------------------
  
-    - implement some additional methods to easy fetch certain tag
-
 - implement edit requests model

@@ -1,10 +1,15 @@
 from flask import render_template, url_for, redirect, request, flash, abort
 from app import app
+from app.models import Section, Tag
 
 from flask_login import current_user
 
 @app.route('/')
 def index():
-    if current_user.is_authenticated:
-        return "Hello, {}".format(current_user.nickname)
-    return "Hello dude!"
+    # get all sections
+    sections = Section.query.all()
+
+    # get all tags
+    tags = Tag.query.all()
+    
+    return render_template('main_page.html', sections=sections, tags=tags)

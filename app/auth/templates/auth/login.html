@@ -1,35 +1,28 @@
-
 {% extends "base.html" %}
 {% block content %}
-<h1>Sign In</h1>
+<h1 style="text-align: center; margin-top: 15px;">Sign In</h1>
 
+<form class="container col-md-4" method="POST" action="{{url_for('auth.login')}}">
 
-{% for cat, msg in get_flashed_messages(True) %}
-<ul class="list-group">
-    <li class="list-group-item list-group-item-{{cat}}">{{msg}}</li>
-</ul>
-{%endfor %}
+    
+    <div class="mb-3">
+        {{ form.email.label(class="form-label") }}
+        {{ form.email(class="form-control") }}
+    </div>
 
+    <div class="mb-3">
+        {{ form.password.label(class="form-label") }}
+        {{ form.password(class="form-control") }}
+    </div>
 
-
-{% from "_render_field.html" import render_field %}
-
-<form method="POST" action="{{url_for('auth.login')}}">
-
- {{ form.csrf_token }}
-
- {{ render_field(form.email) }}
-
- {{render_field(form.password)}}
-
- {{render_field(form.remember)}}
-
- {{render_field(form.submit)}}
-
+    <div class="mb-3">
+        {{ form.remember(class="form-check-input") }}
+        {{ form.remember.label(class="form-check-label") }}
+    </div>
+        
+        {{ form.csrf_token }}
+        {{form.submit(class="form-control btn btn-primary")}}
+        
 </form>
 
-
 {% endblock %}
- 
-
-

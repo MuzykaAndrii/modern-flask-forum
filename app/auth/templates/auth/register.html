@@ -1,37 +1,35 @@
-
 {% extends "base.html" %}
 {% block content %}
-<h1>Sign Up</h1>
+<h1 style="text-align: center; margin-top: 15px;">Sign Up</h1>
+
+<form class="container col-md-4" method="POST" action="{{url_for('auth.register')}}">
+
+    {{ form.csrf_token }}
+
+    <div class="mb-3">
+        {{ form.email.label(class="form-label") }}
+        {{ form.email(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.nickname.label(class="form-label") }}
+        {{ form.nickname(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.password.label(class="form-label") }}
+        {{ form.password(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.confirm_password.label(class="form-label") }}
+        {{ form.confirm_password(class="form-control") }}
+    </div>
 
 
-{% for cat, msg in get_flashed_messages(True) %}
-<ul class="list-group">
-    <li class="list-group-item list-group-item-{{cat}}">{{msg}}</li>
-</ul>
-{%endfor %}
-
-
-
-{% from "_render_field.html" import render_field %}
-
-<form method="POST" action="{{url_for('auth.register')}}">
-
- {{ form.csrf_token }}
-
- {{ render_field(form.email) }}
-
- {{render_field(form.nickname)}}
-
- {{render_field(form.password)}}
-
- {{render_field(form.confirm_password)}}
-
- {{render_field(form.submit)}}
+    {{form.submit(class="form-control btn btn-primary")}}
 
 </form>
 
 
 {% endblock %}
- 
-
-
