@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ discussion.theme }}</h1>
+
+{% for tag in discussion.tags %}
+
+    <span class="badge bg-secondary">{{ tag.name }}</span>
+
+{% endfor %}
+
+{% for comment in discussion.comments %}
+
+    <p>{{ comment.text }}</p>
+
+{% endfor %}
+
+
+{% endblock %}

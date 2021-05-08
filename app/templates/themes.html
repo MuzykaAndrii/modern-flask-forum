@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% for theme in themes %}
+
+    <a href="{{ url_for('discussions_index', section_slug=section_slug, theme_slug=theme.slug) }}">{{ theme.name }}</a>
+
+{% endfor %}
+
+
+{% endblock %}
