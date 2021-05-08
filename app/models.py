@@ -86,6 +86,7 @@ class Image(db.Model):
 class Section(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
+    description = db.Column(db.String(255), unique=True)
     slug = db.Column(db.String(100), unique=True, nullable=False)
 
     # themes prop, bound with next model
@@ -117,7 +118,8 @@ class Theme(DbMixin, db.Model):
 
 class Discussion(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
-    theme = db.Column(db.Text, unique=True, nullable=False)
+    theme = db.Column(db.String, unique=True, nullable=False)
+    text = db.Column(db.Text, unique=True, nullable=False)
 
     # field needed to link this model with parent section
     theme_id = db.Column(db.Integer, db.ForeignKey('theme.id'), nullable=False)
@@ -132,8 +134,9 @@ class Discussion(DbMixin, db.Model):
     # creator id, links this model with creator
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    def __init__(self, theme, theme_id, creator_id):
+    def __init__(self, theme, text, theme_id, creator_id):
         self.theme = theme
+        self.text = text
         self.theme_id = theme_id
         self.creator_id = creator_id
 
