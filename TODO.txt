@@ -15,3 +15,17 @@
 ------------------------------DONE-------------------------------
  
 - implement edit requests model
+- implement 404 page
+
+- create layouts:
+    - themes catalog
+    - discussions catalog
+    - discussion page
+
+- implement discussion creation possibility for logged users
+    - implement form
+    - implement page
+    - implement access decorator
+    - implement controller
+
+- implement users roles
