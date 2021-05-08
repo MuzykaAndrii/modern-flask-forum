@@ -4,6 +4,7 @@ from flask_login import UserMixin, current_user
 from app import login
 from app import bcrypt
 from utils.image_handler import *
+from slugify import slugify
 
 @login.user_loader
 def user_loader(user_id):
@@ -85,6 +86,7 @@ class Image(db.Model):
 class Section(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
+    slug = db.Column(db.String(100), unique=True, nullable=False)
 
     # themes prop, bound with next model
     themes = db.relationship('Theme', backref='parent_section', lazy='dynamic')
@@ -94,11 +96,13 @@ class Section(DbMixin, db.Model):
 
     def __init__(self, name):
         self.name = name
+        self.slug = slugify(self.name)
 
 
 class Theme(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String(150), unique=True, nullable=False)
+    slug = db.Column(db.String(100), unique=True, nullable=False)
 
     # field needed to link this model with parent section
     section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
@@ -108,6 +112,7 @@ class Theme(DbMixin, db.Model):
 
     def __init__(self, name, section_id):
         self.name = name
+        self.slug = slugify(self.name)
         self.section_id = section_id
 
 class Discussion(DbMixin, db.Model):
