@@ -13,9 +13,12 @@
 
 - implement 404 page
 
+- implement edit requests model
+
+- replace blog to forum path in views
+
 ------------------------------DONE-------------------------------
  
-- implement edit requests model
 
 - create layouts:
     - themes catalog
@@ -29,4 +32,3 @@
     - implement controller
 
 - implement users roles
-- replace blog to forum path in views

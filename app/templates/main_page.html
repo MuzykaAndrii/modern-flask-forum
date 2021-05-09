@@ -6,13 +6,17 @@
         <div class="sections col-md-9">
 
             {% for section in sections %}
-            
+
             <div class="card d-flex">
                 <div class="card-body">
-                    <h5 class="card-title"><a class="link-secondary" href="{{ url_for('themes_index', section_slug=section.slug) }}">{{ section.name }}</a></h5>
-                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to
-                        additional
-                        content. This content is a little bit longer.</p>
+                    <h5 class="card-title"><a class="link-secondary"
+                            href="{{ url_for('themes_index', section_slug=section.slug) }}">{{ section.name }}</a></h5>
+                    {% if section.description %}
+                    <p class="card-text">
+                        {{ section.description | truncate(100) }}
+                    </p>
+                    {% endif %}
+
                     <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
                 </div>
             </div>
@@ -44,10 +48,10 @@
 
                     {% for tag in tags %}
 
-                        <a class="tag badge bg-primary">{{ tag.name }}</a>
+                    <a class="tag badge bg-primary">{{ tag.name }}</a>
 
                     {% endfor %}
-    
+
                 </div>
             </div>
 

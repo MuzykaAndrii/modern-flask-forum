@@ -1,11 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% for discussion in discussions %}
 
-    <a href="{{ url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion.id) }}">{{ discussion.theme }}</a>
+<div class="container">
+    <div style="margin: 25px 0;" class="list-group">
+        {% for discussion in discussions %}
+        <a href="{{ url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion.id) }}"
+            class="list-group-item list-group-item-action" aria-current="true">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ discussion.theme }}</h5>
+                <small>3 days ago</small>
+            </div>
+            <p class="mb-1">{{ discussion.text | truncate(100) }}</p>
+            <small>
+                {% for tag in discussion.tags %}
+                <span class="badge bg-secondary">{{ tag.name }}</span>
+                {% endfor %}
 
-{% endfor %}
+            </small>
+        </a>
+        {% endfor %}
+    </div>
+
+</div>
 
 
 {% endblock %}
