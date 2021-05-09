@@ -42,6 +42,9 @@ class User(UserMixin, DbMixin, db.Model):
     # user photos
     avatars = db.relationship('Image', backref='owner', lazy='select')
 
+    # created edit requests
+    edit_requests = db.relationship('Edit_request', backref='editor', lazy='dynamic')
+
     def __init__(self, nickname, email, password):
         self.nickname = nickname
         self.email = email
@@ -134,6 +137,9 @@ class Discussion(DbMixin, db.Model):
     # creator id, links this model with creator
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+    # stores requests to edit topic
+    edit_requests = db.relationship('Edit_request', backref='target_discussion', lazy='select')
+
     def __init__(self, theme, text, theme_id, creator_id):
         self.theme = theme
         self.text = text
@@ -170,3 +176,9 @@ class Tag(DbMixin, db.Model):
     def __repr__(self):
         return f"<Tag: '{self.name}', father section: '{self.section_id}', id: '{self.id}'>"
 
+class Edit_request(DbMixin, db.Model):
+    id = db.Column(db.Integer, primary_key = True, autoincrement=True)
+    text = db.Column(db.Text, unique=True, nullable=False)
+
+    target_id = db.Column(db.Integer, db.ForeignKey('discussion.id'), nullable=False)
+    editor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
