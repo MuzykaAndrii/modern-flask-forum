@@ -11,11 +11,11 @@
     - link them with discussions (largest part)
     - implement some additional methods to easy fetch certain tag
 
+- implement 404 page
 
 ------------------------------DONE-------------------------------
  
 - implement edit requests model
-- implement 404 page
 
 - create layouts:
     - themes catalog
@@ -29,3 +29,4 @@
     - implement controller
 
 - implement users roles
+- replace blog to forum path in views
