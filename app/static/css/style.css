@@ -20,3 +20,11 @@
     cursor: pointer;
     color: silver;
 }
+.heading {
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+.breadcrumb {
+    margin-bottom: 0;
+    line-height: 35px;
+}

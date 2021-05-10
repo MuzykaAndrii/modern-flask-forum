@@ -1,25 +1,80 @@
-{% extends "base.html" %}
+{% extends "layouts/base.html" %}
 {% block content %}
 
 
 <div class="container">
-    <div style="margin: 25px 0;" class="list-group">
-        {% for discussion in discussions %}
-        <a href="{{ url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion.id) }}"
-            class="list-group-item list-group-item-action" aria-current="true">
-            <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">{{ discussion.theme }}</h5>
-                <small>3 days ago</small>
-            </div>
-            <p class="mb-1">{{ discussion.text | truncate(100) }}</p>
-            <small>
-                {% for tag in discussion.tags %}
-                <span class="badge bg-secondary">{{ tag.name }}</span>
-                {% endfor %}
+    <div class="row">
 
-            </small>
-        </a>
-        {% endfor %}
+        <div style="margin: 25px 0;" class="list-group col-md-9">
+
+
+            <div class="heading d-flex">
+
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Library</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Data</li>
+                    </ol>
+                </nav>
+
+                {% if current_user.is_anonymous %}
+
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Create you own topic
+                </button>
+
+
+                {% else %}
+                <a class="btn btn-primary"
+                    href="{{ url_for('create_topic', section_slug=section_slug, theme_slug=theme_slug) }}"
+                    class="list-group-item list-group-item-action" aria-current="true">
+                    Create you own topic
+                </a>
+                {% endif %}
+
+
+            </div>
+
+
+            {% for discussion in discussions %}
+            <a href="{{ url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion.id) }}"
+                class="list-group-item list-group-item-action" aria-current="true">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ discussion.theme }}</h5>
+                    <small>3 days ago</small>
+                </div>
+                <p class="mb-1">{{ discussion.text | truncate(100) }}</p>
+                <small>
+                    {% for tag in discussion.tags %}
+                    <span class="badge bg-secondary">{{ tag.name }}</span>
+                    {% endfor %}
+
+                </small>
+            </a>
+            {% endfor %}
+        </div>
+
+        {% include 'layouts/sidebar.html' %}
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    You must have an account. Please log in or register new account.
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ url_for('auth.login') }}" type="button" class="btn btn-primary">Log in</a>
+                    <a href="{{ url_for('auth.register') }}" type="button" class="btn btn-primary">Register</a>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

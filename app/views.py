@@ -2,7 +2,7 @@ from flask import render_template, url_for, redirect, request, flash, abort
 from app import app
 from app.models import Section, Tag, Theme, Discussion
 
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -41,3 +41,9 @@ def discussion(section_slug, theme_slug, discussion_id):
     current_discussion = Discussion.query.filter(Discussion.theme_id==current_theme.id, Discussion.id==discussion_id).first_or_404()
 
     return render_template('discussion.html', discussion=current_discussion, title=current_discussion.theme)
+
+@app.route('/forum/<section_slug>/<theme_slug>/new')
+@login_required
+def create_topic(section_slug, theme_slug):
+
+    return render_template('create_topic.html', title='New topic')

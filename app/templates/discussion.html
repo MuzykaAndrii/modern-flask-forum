@@ -1,21 +1,25 @@
-{% extends "base.html" %}
+{% extends "layouts/base.html" %}
 {% block content %}
 
-<h1>{{ discussion.theme }}</h1>
+<div class="container">
 
-{% for tag in discussion.tags %}
-
-    <span class="badge bg-secondary">{{ tag.name }}</span>
-
-{% endfor %}
-
-<p>{{ discussion.text }}</p>
-
-{% for comment in discussion.comments %}
-
-    <p>{{ comment.text }}</p>
-
-{% endfor %}
-
+    
+    <h1>{{ discussion.theme }}</h1>
+    
+    {% for tag in discussion.tags %}
+    
+        <span class="badge bg-secondary">{{ tag.name }}</span>
+    
+    {% endfor %}
+    
+    <p>{{ discussion.text }}</p>
+    
+    {% for comment in discussion.comments %}
+    
+        <p>{{ comment.text }}</p>
+    
+    {% endfor %}
+    
+</div>
 
 {% endblock %}

@@ -24,7 +24,11 @@
 
 ------------------------------DONE-------------------------------
  
- -update created layouts
+ - update created layouts
+
+ - create links in tags
+
+ - fix tags bug
 
 
 - implement discussion creation possibility for logged users
