@@ -17,13 +17,15 @@
 
 - replace blog to forum path in views
 
-------------------------------DONE-------------------------------
- 
-
 - create layouts:
     - themes catalog
     - discussions catalog
     - discussion page
+
+------------------------------DONE-------------------------------
+ 
+ -update created layouts
+
 
 - implement discussion creation possibility for logged users
     - implement form
