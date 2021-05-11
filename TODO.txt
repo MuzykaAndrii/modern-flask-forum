@@ -30,6 +30,7 @@
 
  - implement leaving comments possibility
 
+ - implement user account settings
 ------------------------------DONE-------------------------------
  - fix tags bug
 
@@ -41,7 +42,6 @@
 
  - implement users profiles
 
- - implement user account settings
 
  - implement topic edit request possibility
 
