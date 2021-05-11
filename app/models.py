@@ -98,6 +98,10 @@ class Section(DbMixin, db.Model):
     # saves all tags from this section
     tags = db.relationship('Tag', backref='parent_section', lazy='dynamic')
 
+    @staticmethod
+    def get_from_slug(slug):
+        return Section.query.filter_by(slug=slug).first_or_404()
+
     def __init__(self, name):
         self.name = name
         self.slug = slugify(self.name)
@@ -113,6 +117,10 @@ class Theme(DbMixin, db.Model):
 
     # discussions prop, bound with next model primary key
     discussions = db.relationship('Discussion', backref='parent_theme', lazy='dynamic')
+
+    @staticmethod
+    def get_current_theme(theme_slug, section_id):
+        return Theme.query.filter_by(slug=theme_slug, section_id=section_id).first_or_404()
 
     def __init__(self, name, section_id):
         self.name = name
@@ -139,6 +147,10 @@ class Discussion(DbMixin, db.Model):
 
     # stores requests to edit topic
     edit_requests = db.relationship('Edit_request', backref='target_discussion', lazy='select')
+
+    @staticmethod
+    def get_current_discussion(theme_id, discussion_id):
+        return Discussion.query.filter_by(theme_id=theme_id, id=discussion_id).first_or_404()
 
     def __init__(self, theme, text, theme_id, creator_id):
         self.theme = theme

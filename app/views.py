@@ -20,31 +20,31 @@ def index():
     
     return render_template('main_page.html', sections=sections, tags=tags, title='Sections list')
 
-@app.route('/forum/<section_slug>')
+@app.route('/forum/<string:section_slug>')
 def themes_index(section_slug):
-    current_section = Section.query.filter(Section.slug==section_slug).first_or_404()
+    current_section = Section.get_from_slug(section_slug)
     themes = current_section.themes
 
     return render_template('themes.html', themes=themes, section_slug=current_section.slug, title='Themes list')
 
-@app.route('/forum/<section_slug>/<theme_slug>')
+@app.route('/forum/<string:section_slug>/<string:theme_slug>')
 def discussions_index(section_slug, theme_slug):
-    current_section_id = Section.query.filter(Section.slug==section_slug).first_or_404().id
-    current_theme = Theme.query.filter(Theme.slug==theme_slug, Theme.section_id==current_section_id).first_or_404()
+    current_section_id = Section.get_from_slug(section_slug).id
+    current_theme = Theme.get_current_theme(theme_slug, current_section_id)
     discussions = current_theme.discussions
     
     return render_template('discussions.html', discussions=discussions, section_slug=section_slug, theme_slug=current_theme.slug, title='Topics list')
 
-@app.route('/forum/<section_slug>/<theme_slug>/<discussion_id>', methods=['GET'])
+@app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['GET'])
 def discussion(section_slug, theme_slug, discussion_id):
     form = CreateCommentForm()
-    current_section = Section.query.filter(Section.slug==section_slug).first_or_404()
-    current_theme = Theme.query.filter(Theme.slug==theme_slug, Theme.section_id==current_section.id).first_or_404()
-    current_discussion = Discussion.query.filter(Discussion.theme_id==current_theme.id, Discussion.id==discussion_id).first_or_404()
+    current_section = Section.get_from_slug(section_slug)
+    current_theme = Theme.get_current_theme(theme_slug, current_section.id)
+    current_discussion = Discussion.get_current_discussion(current_theme.id, discussion_id)
 
     return render_template('discussion.html', discussion=current_discussion, title=current_discussion.theme, section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form)
 
-@app.route('/forum/<section_slug>/<theme_slug>/<discussion_id>', methods=['POST'])
+@app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['POST'])
 @login_required
 def create_comment(section_slug, theme_slug, discussion_id):
     form = CreateCommentForm()
@@ -59,7 +59,7 @@ def create_comment(section_slug, theme_slug, discussion_id):
     return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form))
 
 # CREATE NEW TOPIC
-@app.route('/forum/<section_slug>/<theme_slug>/new', methods=['GET', 'POST'])
+@app.route('/forum/<string:section_slug>/<string:theme_slug>/new', methods=['GET', 'POST'])
 @login_required
 def create_topic(section_slug, theme_slug):
 
@@ -80,8 +80,8 @@ def create_topic(section_slug, theme_slug):
         return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=topic.id ))
 
     #gather all needed data
-    section_id = Section.query.filter(Section.slug==section_slug).first_or_404().id
-    theme_id = Theme.query.filter(Theme.slug==theme_slug, Theme.section_id==section_id).first_or_404().id
+    section_id = Section.get_from_slug(section_slug).id
+    theme_id = Theme.get_current_theme(theme_slug, current_section_id).id
     tags = Tag.query.filter(Tag.section_id==section_id).all()
 
     # sets pregathered data
