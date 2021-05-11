@@ -1,8 +1,17 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, HiddenField, SelectMultipleField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Regexp
 from app.models import User
+# from wtforms_sqlalchemy.fields import QuerySelectField
+
+class NonValidatingSelectMultipleField(SelectMultipleField):
+    """
+    Attempt to make an open ended select multiple field that can accept dynamic
+    choices added by the browser.
+    """
+    def pre_validate(self, form):
+        pass
 
 class RegistrationForm(FlaskForm):
     nickname = StringField('nickname', validators=[Length(min=4, max=25, 
@@ -38,3 +47,18 @@ class LoginForm(FlaskForm):
 class AddPhotoForm(FlaskForm):
     picture = FileField('Add product picture', validators=[FileRequired(), FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Submit')
+
+class CreateDiscussionForm(FlaskForm):
+    theme = StringField('Theme of your topic',validators=[DataRequired(message='This area is required'),
+                                            Length(min=20, max=150, message='Theme of topic must be in range from 20 to 150 characters')])
+    text = TextAreaField('Your entire question or something else must be here', validators=[DataRequired(message='This area is required'),
+                                            Length(min=30, max=10000,message='Description of topic must be in range from 50 to 10 000 characters' )])
+    # theme id
+    theme_id = HiddenField(validators=[DataRequired()])
+
+    # section_id = HiddenField(validators=[DataRequired()])
+
+    tags = NonValidatingSelectMultipleField('Add a couple tags according to you theme', choices=[], coerce=int)
+
+    submit = SubmitField('Create')
+

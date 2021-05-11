@@ -30,6 +30,8 @@
 
  - fix tags bug
 
+ - implement bread crumbs feature
+
 
 - implement discussion creation possibility for logged users
     - implement form

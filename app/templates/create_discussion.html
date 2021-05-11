@@ -1,0 +1,52 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+
+<div style="margin-top: 25px;" class="container">
+
+    <form class="row justify-content-center" method="POST"
+        action="{{ url_for('create_topic', section_slug=section_slug, theme_slug=theme_slug) }}">
+
+            {{ form.csrf_token }}
+
+
+            <div class="col-md-12">
+                {{ form.theme.label(class="form-label") }}
+                <input id="formTheme" name="{{ form.theme.name }}" class="form-control form-control-lg" type="text"
+                    placeholder="The header, type there short description of your topic"
+                    aria-label=".form-control-lg example">
+            </div>
+
+
+
+            <div class="mb-3 col-md-9">
+                <label for="exampleFormControlTextarea1" class="form-label">{{ form.text.label }}</label>
+                <textarea name="{{ form.text.name }}" class="form-control" id="exampleFormControlTextarea1"
+                    rows="15"></textarea>
+            </div>
+
+            <div class="mb-3 col-md-3">
+                {{ form.tags.label(class="form-label") }}
+                <select size="16" id="formTheme1" name="{{ form.tags.name }}" class="form-select" multiple>
+                    {% for tag in form.tags.data %}
+                    <option style="width: 300px" value="{{ tag[0] }}">{{ tag[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {% if form.tags.errors %}
+
+            {% for error in form.tags.errors %}
+            {{ error }}
+            {% endfor %}
+
+            {% endif %}
+
+            {{ form.theme_id }}
+
+            {{ form.submit(class="btn btn-success col-md-6") }}
+
+
+    </form>
+</div>
+
+{% endblock %}

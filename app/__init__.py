@@ -11,7 +11,7 @@ db = SQLAlchemy(app, metadata=metadata)
 bcrypt = Bcrypt(app)
 
 login = LoginManager(app)
-login.login_view = 'login'
+login.login_view = 'auth.login'
 login.session_protection = 'strong'
 login.login_message_category = 'info'
 

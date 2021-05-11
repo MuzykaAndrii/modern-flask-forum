@@ -1,8 +1,8 @@
 from flask import render_template, url_for, redirect, request, flash, abort
 from app import app
 from app.models import Section, Tag, Theme, Discussion
-
 from flask_login import current_user, login_required
+from app.forms import CreateDiscussionForm
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -10,6 +10,7 @@ def page_not_found(e):
     return render_template('404.html', title='Not found'), 404
 
 @app.route('/forum')
+@app.route('/')
 def index():
     # get all sections
     sections = Section.query.limit(7).all()
@@ -42,8 +43,34 @@ def discussion(section_slug, theme_slug, discussion_id):
 
     return render_template('discussion.html', discussion=current_discussion, title=current_discussion.theme)
 
-@app.route('/forum/<section_slug>/<theme_slug>/new')
+@app.route('/forum/<section_slug>/<theme_slug>/new', methods=['GET', 'POST'])
 @login_required
 def create_topic(section_slug, theme_slug):
 
-    return render_template('create_topic.html', title='New topic')
+    form = CreateDiscussionForm()
+
+    if request.method == "POST" and form.validate_on_submit():
+        theme = form.theme.data
+        text = form.text.data
+        theme_id = form.theme_id.data
+        tags = form.tags.data
+        print(tags)
+        creator_id = current_user.id
+
+        topic = Discussion(theme, text, theme_id, creator_id)
+        topic.tags = [Tag.query.filter(Tag.id==tag_id).first_or_404() for tag_id in tags]
+        topic.save()
+
+        flash('Topic created successfully', 'success')
+        return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=topic.id ))
+
+    #gather all needed data
+    section_id = Section.query.filter(Section.slug==section_slug).first_or_404().id
+    theme_id = Theme.query.filter(Theme.slug==theme_slug, Theme.section_id==section_id).first_or_404().id
+    tags = Tag.query.filter(Tag.section_id==section_id).all()
+
+    # sets pregathered data
+    form.theme_id.data = theme_id
+    form.tags.data = [(tag.id, tag.name) for tag in tags]
+
+    return render_template('create_discussion.html', title='New topic', form=form, section_slug=section_slug, theme_slug=theme_slug)

@@ -176,6 +176,8 @@ class Tag(DbMixin, db.Model):
     def __repr__(self):
         return f"<Tag: '{self.name}', father section: '{self.section_id}', id: '{self.id}'>"
 
+
+
 class Edit_request(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     text = db.Column(db.Text, unique=True, nullable=False)
