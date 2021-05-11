@@ -1,8 +1,8 @@
 from flask import render_template, url_for, redirect, request, flash, abort
 from app import app
-from app.models import Section, Tag, Theme, Discussion
+from app.models import Section, Tag, Theme, Discussion, Comment
 from flask_login import current_user, login_required
-from app.forms import CreateDiscussionForm
+from app.forms import CreateDiscussionForm, CreateCommentForm
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -35,14 +35,30 @@ def discussions_index(section_slug, theme_slug):
     
     return render_template('discussions.html', discussions=discussions, section_slug=section_slug, theme_slug=current_theme.slug, title='Topics list')
 
-@app.route('/forum/<section_slug>/<theme_slug>/<discussion_id>')
+@app.route('/forum/<section_slug>/<theme_slug>/<discussion_id>', methods=['GET'])
 def discussion(section_slug, theme_slug, discussion_id):
+    form = CreateCommentForm()
     current_section = Section.query.filter(Section.slug==section_slug).first_or_404()
     current_theme = Theme.query.filter(Theme.slug==theme_slug, Theme.section_id==current_section.id).first_or_404()
     current_discussion = Discussion.query.filter(Discussion.theme_id==current_theme.id, Discussion.id==discussion_id).first_or_404()
 
-    return render_template('discussion.html', discussion=current_discussion, title=current_discussion.theme)
+    return render_template('discussion.html', discussion=current_discussion, title=current_discussion.theme, section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form)
 
+@app.route('/forum/<section_slug>/<theme_slug>/<discussion_id>', methods=['POST'])
+@login_required
+def create_comment(section_slug, theme_slug, discussion_id):
+    form = CreateCommentForm()
+
+    if form.validate_on_submit():
+        text = form.text.data
+        comment = Comment(text, discussion_id, current_user.id)
+        comment.save()
+        flash('Comment created successfully', 'success')
+
+
+    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form))
+
+# CREATE NEW TOPIC
 @app.route('/forum/<section_slug>/<theme_slug>/new', methods=['GET', 'POST'])
 @login_required
 def create_topic(section_slug, theme_slug):
@@ -54,7 +70,6 @@ def create_topic(section_slug, theme_slug):
         text = form.text.data
         theme_id = form.theme_id.data
         tags = form.tags.data
-        print(tags)
         creator_id = current_user.id
 
         topic = Discussion(theme, text, theme_id, creator_id)

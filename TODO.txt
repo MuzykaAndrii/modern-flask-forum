@@ -22,7 +22,16 @@
     - discussions catalog
     - discussion page
 
+- implement discussion creation possibility for logged users
+    - implement form
+    - implement page
+    - implement access decorator
+    - implement controller
+
 ------------------------------DONE-------------------------------
+ - implement leaving comments possibility
+
+ - implement validation tags
  
  - update created layouts
 
@@ -30,13 +39,12 @@
 
  - fix tags bug
 
+ - implement users profiles
+
+ - implement user account settings
+
+ - implement topic edit request possibility
+
+ - implement users roles
+
  - implement bread crumbs feature
-
-
-- implement discussion creation possibility for logged users
-    - implement form
-    - implement page
-    - implement access decorator
-    - implement controller
-
-- implement users roles

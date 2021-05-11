@@ -56,9 +56,15 @@ class CreateDiscussionForm(FlaskForm):
     # theme id
     theme_id = HiddenField(validators=[DataRequired()])
 
-    # section_id = HiddenField(validators=[DataRequired()])
-
+    """
+    Since choices array are empty in class definition, and generates in certain controller dynamically,
+    validation method compares empty choices and generated choices and raises not valid choice exception.
+    NonValidatingSelectMultipleField overrides SelectMultipleField validate method, and make possibility to pass through empty choices array without exception.
+    """
     tags = NonValidatingSelectMultipleField('Add a couple tags according to you theme', choices=[], coerce=int)
-
     submit = SubmitField('Create')
 
+class CreateCommentForm(FlaskForm):
+    text = TextAreaField('You can leave comment here', validators=[DataRequired(message='This area is required'),
+                                            Length(min=2, max=500,message='Comment must be in range from 2 to 500 characters' )])
+    submit = SubmitField('Leave comment')

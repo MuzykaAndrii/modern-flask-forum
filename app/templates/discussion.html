@@ -3,23 +3,44 @@
 
 <div class="container">
 
-    
+
     <h1>{{ discussion.theme }}</h1>
-    
+
     {% for tag in discussion.tags %}
-    
-        <span class="badge bg-secondary">{{ tag.name }}</span>
-    
+
+    <span class="badge bg-secondary">{{ tag.name }}</span>
+
     {% endfor %}
-    
+
     <p>{{ discussion.text }}</p>
-    
+
+    <p class="card-text">Created by: <small class="text-muted">{{discussion.creator.nickname}}</small></p>
+
+    {% if current_user.is_anonymous %}
+
+    <div class="alert alert-warning" role="alert">
+        You should be <a href="{{ url_for('auth.login') }}" class="alert-link">logged in</a> or <a
+            href="{{ url_for('auth.register') }}" class="alert-link">register</a> to leave a comments.
+    </div>
+
+    {% else %}
+
+    <form method="POST" class="mb-3"
+        action="{{ url_for('create_comment', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id) }}">
+        {{ form.csrf_token }}
+        <textarea name="{{ form.text.name }}" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        <button name="{{ form.submit.name }}" type="submit">Leave comment</button>
+        {% from 'layouts/_render_form_errors.html' import render_form_errors %}
+        {{ render_form_errors(form) }}
+    </form>
+
+    {% endif %}
     {% for comment in discussion.comments %}
-    
-        <p>{{ comment.text }}</p>
-    
+
+    {{ comment.creator.nickname }}: <p>{{ comment.text }}</p>
+
     {% endfor %}
-    
+
 </div>
 
 {% endblock %}
