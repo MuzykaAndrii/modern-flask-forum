@@ -1,8 +1,8 @@
 from flask import render_template, url_for, redirect, request, flash, abort
 from app import app
-from app.models import Section, Tag, Theme, Discussion, Comment
+from app.models import Section, Tag, Theme, Discussion, Comment, Image
 from flask_login import current_user, login_required
-from app.forms import CreateDiscussionForm, CreateCommentForm
+from app.forms import CreateDiscussionForm, CreateCommentForm, UpdateAccountForm
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -62,7 +62,6 @@ def create_comment(section_slug, theme_slug, discussion_id):
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/new', methods=['GET', 'POST'])
 @login_required
 def create_topic(section_slug, theme_slug):
-
     form = CreateDiscussionForm()
 
     if request.method == "POST" and form.validate_on_submit():
@@ -81,7 +80,7 @@ def create_topic(section_slug, theme_slug):
 
     #gather all needed data
     section_id = Section.get_from_slug(section_slug).id
-    theme_id = Theme.get_current_theme(theme_slug, current_section_id).id
+    theme_id = Theme.get_current_theme(theme_slug, section_id).id
     tags = Tag.query.filter(Tag.section_id==section_id).all()
 
     # sets pregathered data
@@ -89,3 +88,38 @@ def create_topic(section_slug, theme_slug):
     form.tags.data = [(tag.id, tag.name) for tag in tags]
 
     return render_template('create_discussion.html', title='New topic', form=form, section_slug=section_slug, theme_slug=theme_slug)
+
+@app.route('/user/settings', methods=['GET'])
+@login_required
+def user_settings():
+    form = UpdateAccountForm()
+    form.nickname.data = current_user.nickname
+    form.website.data = current_user.website
+    form.about.data = current_user.about
+    email = current_user.email
+    last_seen = current_user.last_seen
+
+    return render_template('user_settings.html', form=form, email=email, last_seen=last_seen)
+
+
+@app.route('/user/settings/update', methods=['POST'])
+@login_required
+def update_user():
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        current_user.nickname = form.nickname.data
+        current_user.website = form.website.data
+        current_user.about = form.about.data
+
+        if form.image.data:
+            img = Image(current_user.id, form.image.data)
+            img.save()
+
+        try:
+            current_user.save()
+        except:
+            flash('Something went wrong :(', 'error')
+        else:
+            flash('Your account updated successfully', 'success')
+
+    return redirect(url_for('user_settings'))

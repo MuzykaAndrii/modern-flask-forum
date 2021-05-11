@@ -56,7 +56,7 @@
           <a href="{{ url_for('auth.login') }}" type="button" class="btn btn-secondary">Log in</a>
           {% else %}
           <a style="margin-right: 20px;" href="{{ url_for('auth.logout') }}" type="button" class="btn btn-secondary">Logout</a>
-          <a href="" type="button" class="btn btn-light">Profile</a>
+          <a href="{{ url_for('user_settings') }}" type="button" class="btn btn-light">Profile</a>
           {% endif %}
         </form>
       </div>

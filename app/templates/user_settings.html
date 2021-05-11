@@ -1,0 +1,61 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+
+
+<div class="container">
+
+    <div class="row">
+        <form enctype="multipart/form-data" method="POST" action="{{ url_for('update_user') }}" style="margin-top: 25px;"
+            class="col-md-9 list-group list-group-numbered">
+
+            {% from 'layouts/_render_form_errors.html' import render_form_errors %}
+            {{ render_form_errors(form) }}
+
+            {{ form.csrf_token }}
+
+            <label for="site" class="form-label">{{ form.nickname.label }}</label>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">@</span>
+                <input name="{{ form.nickname.name }}" value='{{ form.nickname.data }}' id='site' type="text"
+                    class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+
+            <label for="basic-url" class="form-label">{{ form.website.label }}</label>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon3">https://example.com</span>
+                <input name="{{ form.website.name }}" value="{{ form.website.data }}" type="text" class="form-control"
+                    id="basic-url" aria-describedby="basic-addon3">
+            </div>
+
+            <div class="input-group mb-3">
+                <input disabled type="text" class="form-control" placeholder="{{ email }}" aria-label="Username">
+                <span class="input-group-text">@</span>
+                <input disabled type="text" class="form-control" placeholder="{{ last_seen }}" aria-label="Server">
+            </div>
+
+            <div class="input-group">
+                <span class="input-group-text">{{ form.about.label }}</span>
+                <textarea name="{{ form.about.name }}" rows='7' class="form-control" value="{{ form.about.data }}"
+                    aria-label="With textarea">{{ form.about.data }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="formFile" class="form-label">{{ form.image.label }}</label>
+                {{ form.image(class="form-control") }}
+            </div>
+
+
+            {{ form.submit(class="btn btn-primary input-group mt-3") }}
+
+        </form>
+
+
+        {% include 'layouts/sidebar.html' %}
+
+
+    </div>
+
+</div>
+
+
+{% endblock %}

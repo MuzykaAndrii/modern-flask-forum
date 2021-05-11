@@ -1,4 +1,5 @@
 from . import db
+from app import app
 from datetime import datetime as dt
 from flask_login import UserMixin, current_user
 from app import login
@@ -27,10 +28,11 @@ discussion_tags = db.Table('discussion_tags',
 
 class User(UserMixin, DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
-    nickname = db.Column(db.String(20), unique=True, nullable=False)
+    nickname = db.Column(db.String(30), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(70), nullable=False)
     about = db.Column(db.Text, default='Hi everyone!')
+    website = db.Column(db.String(120), unique=True)
     last_seen = db.Column(db.DateTime, default=dt.utcnow)
 
     # created discussions
@@ -59,7 +61,7 @@ class User(UserMixin, DbMixin, db.Model):
     def __repr__(self):
         return f"<User: '{self.nickname}', id: '{self.id}'>"
     
-class Image(db.Model):
+class Image(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String, unique=True, nullable=False)
 
@@ -69,16 +71,10 @@ class Image(db.Model):
     def __init__(self, user_id, form_image):
         self.user_id = user_id
         self.name = gen_filename(form_image.filename, app.config['FILENAME_LENGTH'])
-    
-    def save(self, form_image):
         save_picture(form_image, self.name, app.root_path + app.config['USERS_PICS_DIR'], app.config['USERS_PICS_SIZE'])
-
-        db.session.add(self)
-        db.session.commit()
     
     def delete(self):
         delete_file(app.root_path + app.config['USERS_PICS_DIR'] + self.name)
-
         db.session.delete(self)
         db.session.commit()
     

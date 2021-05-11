@@ -28,16 +28,16 @@
     - implement access decorator
     - implement controller
 
-------------------------------DONE-------------------------------
  - implement leaving comments possibility
+
+------------------------------DONE-------------------------------
+ - fix tags bug
 
  - implement validation tags
  
  - update created layouts
 
  - create links in tags
-
- - fix tags bug
 
  - implement users profiles
 

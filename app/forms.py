@@ -68,3 +68,14 @@ class CreateCommentForm(FlaskForm):
     text = TextAreaField('You can leave comment here', validators=[DataRequired(message='This area is required'),
                                             Length(min=2, max=500,message='Comment must be in range from 2 to 500 characters' )])
     submit = SubmitField('Leave comment')
+
+# add image form
+
+# update info form
+class UpdateAccountForm(FlaskForm):
+    nickname = StringField('Nickname', validators=[DataRequired(message='This area is required'), Length(min=3, max=30, message='Nickname must be bigger than 3 and less than 30 characers')])
+    about = TextAreaField('A few words (or not) about you', validators=[DataRequired(message='This area is required'), Length(min=3, max=1000, message='About section must be less than 1000 characters and bigger than 3')])
+    website = StringField('Link of your site or webpage')
+    image = FileField('Update profile avatar', validators=[FileAllowed(['jpg', 'png'])])
+
+    submit = SubmitField('Update info')
