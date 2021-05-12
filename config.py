@@ -15,6 +15,7 @@ WTF_CSRF_ENABLED = True
 SECRET_KEY = 'SuperSecretString'
 
 USERS_PICS_DIR = '/static/images/users_avatars/'
+DEFAULT_AVATAR = USERS_PICS_DIR + 'default.jpg'
 FILENAME_LENGTH = 8
 USERS_PICS_SIZE = (500, 500)
 

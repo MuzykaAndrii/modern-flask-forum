@@ -1,6 +1,6 @@
 from flask import render_template, url_for, redirect, request, flash, abort
 from app import app
-from app.models import Section, Tag, Theme, Discussion, Comment, Image
+from app.models import Section, Tag, Theme, Discussion, Comment, Image, User
 from flask_login import current_user, login_required
 from app.forms import CreateDiscussionForm, CreateCommentForm, UpdateAccountForm
 
@@ -123,3 +123,10 @@ def update_user():
             flash('Your account updated successfully', 'success')
 
     return redirect(url_for('user_settings'))
+
+@app.route('/users/<int:user_id>', methods=['GET'])
+def user_profile(user_id):
+    user = User.query.get_or_404(user_id)
+
+
+    return render_template('user_profile.html', user=user)

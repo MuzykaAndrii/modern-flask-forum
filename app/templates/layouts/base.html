@@ -30,20 +30,7 @@
           <li class="nav-item">
             <a class="nav-link" href="#">Link</a>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
-              aria-expanded="false">
-              Dropdown
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="#">Action</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="#">Something else here</a></li>
-            </ul>
-          </li>
+
           <li class="nav-item">
             <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
           </li>
@@ -55,22 +42,38 @@
           <a href="{{ url_for('auth.register') }}" type="button" class="btn login-btn btn-secondary">Register</a>
           <a href="{{ url_for('auth.login') }}" type="button" class="btn btn-secondary">Log in</a>
           {% else %}
-          <a style="margin-right: 20px;" href="{{ url_for('auth.logout') }}" type="button" class="btn btn-secondary">Logout</a>
-          <a href="{{ url_for('user_settings') }}" type="button" class="btn btn-light">Profile</a>
+          <a style="margin-right: 20px;" href="{{ url_for('auth.logout') }}" type="button"
+            class="btn btn-secondary">Logout</a>
+          
+
+
+
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+              Hello, {{ current_user.nickname }}
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+              <li><a class="dropdown-item" href="{{ url_for('user_profile', user_id=current_user.id) }}">Account</a></li>
+              <li><a href="{{ url_for('user_settings') }}" type="button" class="dropdown-item">Settings</a></li>
+            </ul>
+          </div>
+
+
+
           {% endif %}
         </form>
       </div>
     </div>
   </nav>
 
-  
+
 
 
 
   {% for cat, msg in get_flashed_messages(True) %}
-    <ul style="margin-top: 25px;" class="container list-group">
-        <li class="list-group-item list-group-item-{{cat}}">{{msg}}</li>
-    </ul>
+  <ul style="margin-top: 25px;" class="container list-group">
+    <li class="list-group-item list-group-item-{{cat}}">{{msg}}</li>
+  </ul>
   {%endfor %}
 
   {% block content %}

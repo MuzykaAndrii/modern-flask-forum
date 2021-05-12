@@ -3,43 +3,77 @@
 
 <div class="container">
 
+    <div class="row">
+        <div style="margin: 25px 0;" class="col-md-9">
 
-    <h1>{{ discussion.theme }}</h1>
+            <h1>{{ discussion.theme }}</h1>
 
-    {% for tag in discussion.tags %}
+            {% for tag in discussion.tags %}
 
-    <span class="badge bg-secondary">{{ tag.name }}</span>
+            <span class="badge bg-secondary">{{ tag.name }}</span>
 
-    {% endfor %}
+            {% endfor %}
 
-    <p>{{ discussion.text }}</p>
+            <p>{{ discussion.text }}</p>
 
-    <p class="card-text">Created by: <small class="text-muted">{{discussion.creator.nickname}}</small></p>
+            <p class="card-text">Created by: <a href="{{ url_for('user_profile', user_id=discussion.creator.id) }}"
+                    class="text-muted">{{discussion.creator.nickname}}</a></p>
 
-    {% if current_user.is_anonymous %}
+            {% if current_user.is_anonymous %}
 
-    <div class="alert alert-warning" role="alert">
-        You should be <a href="{{ url_for('auth.login') }}" class="alert-link">logged in</a> or <a
-            href="{{ url_for('auth.register') }}" class="alert-link">register</a> to leave a comments.
+            <div class="alert alert-warning" role="alert">
+                You should be <a href="{{ url_for('auth.login') }}" class="alert-link">logged in</a> or <a
+                    href="{{ url_for('auth.register') }}" class="alert-link">register</a> to leave a comments.
+            </div>
+
+            {% else %}
+
+            <form method="POST" class="mb-3"
+                action="{{ url_for('create_comment', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id) }}">
+                {{ form.csrf_token }}
+                <div class="input-group">
+                    <span class="input-group-text">With textarea</span>
+                    <textarea name="{{ form.text.name }}" class="form-control" id="exampleFormControlTextarea1"
+                        rows="3"></textarea>
+
+                </div>
+                <button class="btn btn-primary mt-3" name="{{ form.submit.name }}" type="submit">Leave comment</button>
+
+                {% from 'layouts/_render_form_errors.html' import render_form_errors %}
+                {{ render_form_errors(form) }}
+            </form>
+
+            {% endif %}
+
+            {% for comment in discussion.comments %}
+
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <div class="col-md-1">
+                        <img class="img-fluid" {% if comment.creator.avatars %}
+                            src="{{ config['USERS_PICS_DIR'] + comment.creator.avatars[-1].name }}" {% else %}
+                            src="{{ config['DEFAULT_AVATAR'] }}" 
+                        {% endif %} >
+                        
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title"><a
+                                    href="{{ url_for('user_profile', user_id=comment.creator.id) }}">{{ comment.creator.nickname }}</a>
+                            </h5>
+                            <p class="card-text">{{ comment.text }}</p>
+                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+        {% include 'layouts/sidebar.html' %}
+
     </div>
 
-    {% else %}
-
-    <form method="POST" class="mb-3"
-        action="{{ url_for('create_comment', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id) }}">
-        {{ form.csrf_token }}
-        <textarea name="{{ form.text.name }}" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-        <button name="{{ form.submit.name }}" type="submit">Leave comment</button>
-        {% from 'layouts/_render_form_errors.html' import render_form_errors %}
-        {{ render_form_errors(form) }}
-    </form>
-
-    {% endif %}
-    {% for comment in discussion.comments %}
-
-    {{ comment.creator.nickname }}: <p>{{ comment.text }}</p>
-
-    {% endfor %}
 
 </div>
 

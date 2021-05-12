@@ -1,0 +1,22 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+
+
+<div class="container">
+
+    <div class="row">
+        <div style="margin-top: 25px;" class="col-md-9 list-group list-group-numbered">
+            {{ user.nickname }}
+
+    </div>
+
+
+        {% include 'layouts/sidebar.html' %}
+
+
+    </div>
+
+</div>
+
+
+{% endblock %}

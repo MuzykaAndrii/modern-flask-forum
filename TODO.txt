@@ -34,14 +34,11 @@
 ------------------------------DONE-------------------------------
  - fix tags bug
 
- - implement validation tags
+ - create links in tags
  
  - update created layouts
 
- - create links in tags
-
  - implement users profiles
-
 
  - implement topic edit request possibility
 
