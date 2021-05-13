@@ -26,6 +26,12 @@ discussion_tags = db.Table('discussion_tags',
                             db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), nullable=False)
     )
 
+users_roles = db.Table('users_roles',
+                        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
+                        db.Column('role_id', db.Integer, db.ForeignKey('role.id'), nullable=False)
+    )
+
+
 class User(UserMixin, DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     nickname = db.Column(db.String(30), unique=True, nullable=False)
@@ -46,6 +52,9 @@ class User(UserMixin, DbMixin, db.Model):
 
     # created edit requests
     edit_requests = db.relationship('Edit_request', backref='editor', lazy='dynamic')
+
+    # user role
+    role = db.relationship('Role', secondary=users_roles, backref=db.backref('users', lazy='dynamic'))
 
     def get_avatar(self):
         if self.avatars.all():
@@ -115,6 +124,9 @@ class Section(DbMixin, db.Model):
     def __init__(self, name):
         self.name = name
         self.slug = slugify(self.name)
+    
+    def __repr__(self):
+        return f"<Section: {self.name}>"
 
 
 class Theme(DbMixin, db.Model):
@@ -136,6 +148,9 @@ class Theme(DbMixin, db.Model):
         self.name = name
         self.slug = slugify(self.name)
         self.section_id = section_id
+    
+    def __repr__(self):
+        return f"<Theme: {self.name}, section: {section_id}>"
 
 class Discussion(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
@@ -167,6 +182,9 @@ class Discussion(DbMixin, db.Model):
         self.text = text
         self.theme_id = theme_id
         self.creator_id = creator_id
+    
+    def __repr__(self):
+        return f"<Discussion: '{self.theme}', theme_id: {theme_id}>"
 
 class Comment(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
@@ -199,10 +217,19 @@ class Tag(DbMixin, db.Model):
         return f"<Tag: '{self.name}', father section: '{self.section_id}', id: '{self.id}'>"
 
 
-
 class Edit_request(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     text = db.Column(db.Text, unique=True, nullable=False)
 
     target_id = db.Column(db.Integer, db.ForeignKey('discussion.id'), nullable=False)
     editor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class Role(DbMixin, db.Model):
+    id = db.Column(db.Integer, primary_key = True, autoincrement=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+
+    def __init__(self, name):
+        self.name = name
+    
+    def __repr__(self):
+        return f"<Role: {self.name}>"
