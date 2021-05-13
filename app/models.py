@@ -54,13 +54,20 @@ class User(UserMixin, DbMixin, db.Model):
     edit_requests = db.relationship('Edit_request', backref='editor', lazy='dynamic')
 
     # user role
-    role = db.relationship('Role', secondary=users_roles, backref=db.backref('users', lazy='dynamic'))
+    roles = db.relationship('Role', secondary=users_roles, backref=db.backref('users', lazy='dynamic'))
 
     def get_avatar(self):
         if self.avatars.all():
             return app.config['USERS_PICS_DIR'] + self.avatars.order_by(Image.date_upload.desc()).first().name
         else:
             return app.config['DEFAULT_AVATAR']
+    
+    def has_role(self, role):
+        for r in self.roles:
+            if r.name == role:
+                return True
+        return False
+
     
     def get_avatars(self):
         if self.avatars:
@@ -150,7 +157,7 @@ class Theme(DbMixin, db.Model):
         self.section_id = section_id
     
     def __repr__(self):
-        return f"<Theme: {self.name}, section: {section_id}>"
+        return f"<Theme: {self.name}, section: {self.section_id}>"
 
 class Discussion(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
@@ -184,7 +191,7 @@ class Discussion(DbMixin, db.Model):
         self.creator_id = creator_id
     
     def __repr__(self):
-        return f"<Discussion: '{self.theme}', theme_id: {theme_id}>"
+        return f"<Discussion: '{self.theme}', theme_id: {self.theme_id}>"
 
 class Comment(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
