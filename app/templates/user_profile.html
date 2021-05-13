@@ -6,9 +6,17 @@
 
     <div class="row">
         <div style="margin-top: 25px;" class="col-md-9 list-group list-group-numbered">
-            {{ user.nickname }}
+            <div class="d-flex justify-content-between">
+                <div class="avatar" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    <img class="" src="{{ user.get_avatar() }}" alt="">
+                </div>
+                <p class="card-text">Last seen: <small class="text-muted">{{ user.last_seen }}</small></p>
+            </div>
+            <h2 class="">{{ user.nickname }}</h2>
 
-    </div>
+
+
+        </div>
 
 
         {% include 'layouts/sidebar.html' %}
@@ -17,6 +25,43 @@
     </div>
 
 </div>
+
+<!-- Modal -->
+{% if user.avatars.all() %}
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{ user.nickname }} avatars:</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="carouselExampleControls" class="carousel carousel-dark slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for img in user.get_avatars() %}
+                        <div class="carousel-item{% if loop.index == 1 %} active{% endif %}">
+                            <img style="height: 80vh" src="{{ img.get_path() }}" class="d-block mx-auto" alt="...">
+                            
+                        </div>
+                        {% endfor %}
+                        
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                        data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                        data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 
 {% endblock %}

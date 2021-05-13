@@ -41,8 +41,9 @@ def discussion(section_slug, theme_slug, discussion_id):
     current_section = Section.get_from_slug(section_slug)
     current_theme = Theme.get_current_theme(theme_slug, current_section.id)
     current_discussion = Discussion.get_current_discussion(current_theme.id, discussion_id)
+    comments = current_discussion.comments.order_by(Comment.written_at.desc())
 
-    return render_template('discussion.html', discussion=current_discussion, title=current_discussion.theme, section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form)
+    return render_template('discussion.html', comments=comments, discussion=current_discussion, title=current_discussion.theme, section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form)
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['POST'])
 @login_required
@@ -124,9 +125,8 @@ def update_user():
 
     return redirect(url_for('user_settings'))
 
-@app.route('/users/<int:user_id>', methods=['GET'])
+@app.route('/user/<int:user_id>', methods=['GET'])
 def user_profile(user_id):
     user = User.query.get_or_404(user_id)
-
 
     return render_template('user_profile.html', user=user)

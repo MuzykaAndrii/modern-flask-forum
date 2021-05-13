@@ -42,10 +42,20 @@ class User(UserMixin, DbMixin, db.Model):
     created_comments = db.relationship('Comment', backref='creator', lazy='dynamic')
 
     # user photos
-    avatars = db.relationship('Image', backref='owner', lazy='select')
+    avatars = db.relationship('Image', backref='owner', lazy='dynamic')
 
     # created edit requests
     edit_requests = db.relationship('Edit_request', backref='editor', lazy='dynamic')
+
+    def get_avatar(self):
+        if self.avatars.all():
+            return app.config['USERS_PICS_DIR'] + self.avatars.order_by(Image.date_upload.desc()).first().name
+        else:
+            return app.config['DEFAULT_AVATAR']
+    
+    def get_avatars(self):
+        if self.avatars:
+            return self.avatars.order_by(Image.date_upload.desc())
 
     def __init__(self, nickname, email, password):
         self.nickname = nickname
@@ -64,9 +74,13 @@ class User(UserMixin, DbMixin, db.Model):
 class Image(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String, unique=True, nullable=False)
+    date_upload = db.Column(db.DateTime, default=dt.utcnow)
 
     # links this model with user
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def get_path(self):
+        return app.config['USERS_PICS_DIR'] + self.name
 
     def __init__(self, user_id, form_image):
         self.user_id = user_id

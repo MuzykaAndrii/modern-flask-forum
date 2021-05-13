@@ -45,15 +45,12 @@
 
             {% endif %}
 
-            {% for comment in discussion.comments %}
+            {% for comment in comments %}
 
             <div class="card mb-3">
                 <div class="row g-0">
                     <div class="col-md-1">
-                        <img class="img-fluid" {% if comment.creator.avatars %}
-                            src="{{ config['USERS_PICS_DIR'] + comment.creator.avatars[-1].name }}" {% else %}
-                            src="{{ config['DEFAULT_AVATAR'] }}" 
-                        {% endif %} >
+                        <img class="img-fluid" src="{{ comment.creator.get_avatar() }}" >
                         
                     </div>
                     <div class="col-md-8">
@@ -62,7 +59,7 @@
                                     href="{{ url_for('user_profile', user_id=comment.creator.id) }}">{{ comment.creator.nickname }}</a>
                             </h5>
                             <p class="card-text">{{ comment.text }}</p>
-                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                            <p class="card-text"><small class="text-muted">{{ comment.written_at }}</small></p>
                         </div>
                     </div>
                 </div>

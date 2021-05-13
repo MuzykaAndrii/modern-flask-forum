@@ -17,7 +17,7 @@ SECRET_KEY = 'SuperSecretString'
 USERS_PICS_DIR = '/static/images/users_avatars/'
 DEFAULT_AVATAR = USERS_PICS_DIR + 'default.jpg'
 FILENAME_LENGTH = 8
-USERS_PICS_SIZE = (500, 500)
+USERS_PICS_SIZE = (1000, 1000)
 
 SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'site.db')
 SQLALCHEMY_TRACK_MODIFICATIONS = False

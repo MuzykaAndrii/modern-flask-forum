@@ -6,6 +6,9 @@
 
     {{ form.csrf_token }}
 
+    {% from 'layouts/_render_form_errors.html' import render_form_errors %}
+    {{ render_form_errors(form) }}
+
     <div class="mb-3">
         {{ form.email.label(class="form-label") }}
         {{ form.email(class="form-control") }}
