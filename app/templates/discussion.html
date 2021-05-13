@@ -49,11 +49,16 @@
 
             <div class="card mb-3">
                 <div class="row g-0">
-                    <div class="col-md-1">
-                        <img class="img-fluid" src="{{ comment.creator.get_avatar() }}" >
-                        
+                    <div class="col-md-2 user-info">
+
+                        <div class="img-wrapper">
+                            <img class="img-fluid user-icon" src="{{ comment.creator.get_avatar() }}">
+                        </div>
+                        <div style="margin-left: 13px;">
+                            <small class="text-muted">{{ comment.creator.last_seen.date() }}</small>
+                        </div>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-9">
                         <div class="card-body">
                             <h5 class="card-title"><a
                                     href="{{ url_for('user_profile', user_id=comment.creator.id) }}">{{ comment.creator.nickname }}</a>

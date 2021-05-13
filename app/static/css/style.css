@@ -28,6 +28,21 @@
     margin-bottom: 0;
     line-height: 35px;
 }
+.user-info {
+    margin-top: 15px;
+    margin-left: 15px;
+}
+.img-wrapper {
+    width: 100px;
+    height: 100px;
+    margin-right: 15px;
+}
+.user-icon {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+}
 
 .avatar {
     width: 200px;

@@ -66,7 +66,7 @@ class CreateDiscussionForm(FlaskForm):
 
 class CreateCommentForm(FlaskForm):
     text = TextAreaField('You can leave comment here', validators=[DataRequired(message='This area is required'),
-                                            Length(min=2, max=500,message='Comment must be in range from 2 to 500 characters' )])
+                                            Length(min=2, max=10000,message='Comment must be in range from 2 to 500 characters' )])
     submit = SubmitField('Leave comment')
 
 # add image form

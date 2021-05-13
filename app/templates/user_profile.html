@@ -39,7 +39,7 @@
                 <div id="carouselExampleControls" class="carousel carousel-dark slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
                         {% for img in user.get_avatars() %}
-                        <div class="carousel-item{% if loop.index == 1 %} active{% endif %}">
+                        <div class="carousel-item{% if loop.first %} active{% endif %}">
                             <img style="height: 80vh" src="{{ img.get_path() }}" class="d-block mx-auto" alt="...">
                             
                         </div>
