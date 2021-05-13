@@ -39,6 +39,7 @@ class User(UserMixin, DbMixin, db.Model):
     password = db.Column(db.String(70), nullable=False)
     about = db.Column(db.Text, default='Hi everyone!')
     website = db.Column(db.String(120), unique=True)
+    register_date = db.Column(db.DateTime, default=dt.utcnow)
     last_seen = db.Column(db.DateTime, default=dt.utcnow)
 
     # created discussions
@@ -54,13 +55,16 @@ class User(UserMixin, DbMixin, db.Model):
     edit_requests = db.relationship('Edit_request', backref='editor', lazy='dynamic')
 
     # user role
-    roles = db.relationship('Role', secondary=users_roles, backref=db.backref('users', lazy='dynamic'))
+    roles = db.relationship('Role', secondary=users_roles, backref=db.backref('users', lazy='select'))
 
     def get_avatar(self):
         if self.avatars.all():
             return app.config['USERS_PICS_DIR'] + self.avatars.order_by(Image.date_upload.desc()).first().name
         else:
             return app.config['DEFAULT_AVATAR']
+    
+    def last_comments(self):
+        return self.created_comments.order_by(Comment.written_at.desc()).limit(5).all()
     
     def has_role(self, role):
         for r in self.roles:

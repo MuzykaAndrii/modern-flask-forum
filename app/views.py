@@ -3,6 +3,13 @@ from app import app
 from app.models import Section, Tag, Theme, Discussion, Comment, Image, User
 from flask_login import current_user, login_required
 from app.forms import CreateDiscussionForm, CreateCommentForm, UpdateAccountForm
+from datetime import datetime as dt
+
+@app.before_request
+def update_last_seen():
+    if current_user.is_authenticated:
+        current_user.last_seen = dt.now()
+        current_user.save()
 
 @app.errorhandler(404)
 def page_not_found(e):

@@ -6,15 +6,110 @@
 
     <div class="row">
         <div style="margin-top: 25px;" class="col-md-9 list-group list-group-numbered">
-            <div class="d-flex justify-content-between">
-                <div class="avatar" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                    <img class="" src="{{ user.get_avatar() }}" alt="">
+            <div class="d-flex">
+                <div class="user-main">
+                    <div class="avatar" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <img class="" src="{{ user.get_avatar() }}" alt="">
+                    </div>
+                    <h2 class="">{{ user.nickname }}</h2>
                 </div>
-                <p class="card-text">Last seen: <small class="text-muted">{{ user.last_seen }}</small></p>
+                <div class="user-info-page">
+                    <div class="user-info-additionly d-flex justify-content-between">
+                        <div>Website: <a href="{{ user.website }}">{{ user.website }}</a></div>
+                        <div class="card-text">Last seen: <small class="text-muted">{{ user.last_seen }}</small></div>
+                    </div>
+                    <div class="user-info-com fw-bold">
+                        Comments: <span class="badge bg-primary">{{ user.created_comments.count() }}</span>
+                    </div>
+                    <div class="user-info-top fw-bold">
+                        Topics created: <span class="badge bg-success">{{ user.created_discussions.count() }} </span>
+                    </div>
+                    <div class="user-registe fw-bold">
+                        Registered: <span class="badge bg-info text-dark">{{ user.register_date.date }}</span>
+                    </div>
+                    <div class="user-registe fw-bold">
+                        Role:
+                            {% if user.roles %}
+                            {% for role in user.roles %}
+                            <span class="badge bg-danger text-dark">{{ role.name }}</span>
+                            {% endfor %}
+                            {% else %}
+                            <span class="badge bg-warning text-dark">user</span>
+                            {% endif %}
+                    </div><hr>
+                    <div class="user-info-desc">
+                        {{ user.about }}
+                    </div>
+                    <hr>
+
+                </div>
+
             </div>
-            <h2 class="">{{ user.nickname }}</h2>
+
+            <div class="user-overview row">
+                <div class=" col-md-12">
 
 
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Created topics:
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne">
+                            <div style="padding: 0;" class="accordion-body">
+                                
+                                <ul style="border-radius: 0;" class="list-group">
+                                    {% for topic in user.created_discussions.limit(10) %}
+                                    {% set theme_slug = topic.parent_theme.slug %}
+                                    {% set section_slug = topic.parent_theme.parent_section.slug %}
+                                    {% set topic_id = topic.id %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center topic-item">
+                                        <div class="div">
+                                            <a
+                                                href="{{ url_for('themes_index', section_slug=section_slug, theme_slug=theme_slug) }}">{{ topic.parent_theme.name }}</a>
+                                            >
+                                            <a
+                                                href="{{ url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=topic_id) }}">{{ topic.theme }}</a>
+
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">{{ topic.comments.count() }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
+                                Last comments:
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingOne">
+                            <div style="padding: 0;" class="accordion-body">
+                                <div class="list-group">
+                                    {% for comment in user.last_comments() %}
+                                    {% set section_slug = comment.parent_discussion.parent_theme.parent_section.slug %}
+                                    {% set theme_slug = comment.parent_discussion.parent_theme.slug %}
+                                    <div class="list-group-item list-group-item-action" aria-current="true">
+                                      <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Topic: <a href="{{ url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=comment.parent_discussion.id) }}">{{ comment.parent_discussion.theme }}</a></h6>
+                                        <small>{{ comment.written_at }}</small>
+                                      </div>
+                                      <p class="mb-1">{{ comment.text }}</p>
+                                    </div>
+                                    {% endfor %}
+                                  </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
 
         </div>
 
@@ -41,10 +136,10 @@
                         {% for img in user.get_avatars() %}
                         <div class="carousel-item{% if loop.first %} active{% endif %}">
                             <img style="height: 80vh" src="{{ img.get_path() }}" class="d-block mx-auto" alt="...">
-                            
+
                         </div>
                         {% endfor %}
-                        
+
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
                         data-bs-slide="prev">
