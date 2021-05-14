@@ -10,7 +10,7 @@
 
             {% for tag in discussion.tags %}
 
-            <span class="badge bg-secondary">{{ tag.name }}</span>
+            <a class="badge bg-secondary tag" href="{{url_for('tags_discussions', tag_slug=tag.slug)}}">{{ tag.name }}</a>
 
             {% endfor %}
 

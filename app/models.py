@@ -216,12 +216,14 @@ class Comment(DbMixin, db.Model):
 class Tag(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
+    slug = db.Column(db.String(100), unique=True, nullable=False)
 
     # defines belonging to certain section
     section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
 
     def __init__(self, name, section_id):
         self.name = name
+        self.slug = slugify(name)
         self.section_id = section_id
     
     def __repr__(self):

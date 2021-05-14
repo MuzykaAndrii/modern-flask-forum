@@ -137,3 +137,20 @@ def user_profile(user_id):
     user = User.query.get_or_404(user_id)
 
     return render_template('user_profile.html', user=user)
+
+@app.route('/forum/tag/<string:tag_slug>', methods=['GET'])
+def tags_discussions(tag_slug):
+    tag = Tag.query.filter_by(slug=tag_slug).first_or_404()
+    all_themes = tag.parent_section.themes.all()
+
+    all_discussions = list()
+    for theme in all_themes:
+        [all_discussions.append(discussion) for discussion in theme.discussions]
+
+    discussions_with_tag = list()
+    for discussion in all_discussions:
+        for d_tag in discussion.tags:
+            if d_tag.slug == tag_slug:
+                discussions_with_tag.append(discussion)
+
+    return render_template('tags_discussions.html', discussions=discussions_with_tag, tag_name=tag.name, section_slug=tag.parent_section.slug)
