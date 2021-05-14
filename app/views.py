@@ -89,7 +89,7 @@ def create_topic(section_slug, theme_slug):
         topic.save()
 
         flash('Topic created successfully', 'success')
-        return redirect(url_for('forum/discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=topic.id ))
+        return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=topic.id ))
 
     #gather all needed data
     section_id = Section.get_from_slug(section_slug).id

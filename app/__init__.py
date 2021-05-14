@@ -1,8 +1,10 @@
-from flask import Flask
+from flask import Flask, Markup
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from config import metadata
+
+from flask_ckeditor import CKEditor
 
 from flask_admin import Admin
 from app.AdminModelViews import *
@@ -10,6 +12,7 @@ from app.AdminModelViews import *
 
 app = Flask(__name__)
 app.config.from_object('config')
+app.jinja_env.filters['markup'] = Markup
 
 db = SQLAlchemy(app, metadata=metadata)
 bcrypt = Bcrypt(app)
@@ -18,6 +21,8 @@ login = LoginManager(app)
 login.login_view = 'auth.login'
 login.session_protection = 'strong'
 login.login_message_category = 'info'
+
+ckeditor = CKEditor(app)
 
 from app.auth.blueprint import auth
 app.register_blueprint(auth, url_prefix='/auth')

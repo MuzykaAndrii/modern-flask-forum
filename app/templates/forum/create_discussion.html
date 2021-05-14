@@ -2,7 +2,7 @@
 {% block content %}
 
 <div style="margin-top: 25px;" class="container">
-    
+
     {% from 'layouts/_render_form_errors.html' import render_form_errors %}
     {{ render_form_errors(form) }}
 
@@ -19,12 +19,9 @@
                 aria-label=".form-control-lg example">
         </div>
 
-
-
         <div class="mb-3 col-md-9">
             <label for="exampleFormControlTextarea1" class="form-label">{{ form.text.label }}</label>
-            <textarea name="{{ form.text.name }}" class="form-control" id="exampleFormControlTextarea1"
-                rows="15"></textarea>
+                {{ form.text(class="form-control") }}
         </div>
 
         <div class="mb-3 col-md-3">
@@ -36,19 +33,22 @@
             </select>
         </div>
 
+        
         {% if form.tags.errors %}
-
+        
         {% for error in form.tags.errors %}
         {{ error }}
         {% endfor %}
-
+        
         {% endif %}
-
+        
         {{ form.theme_id }}
-
+        
         {{ form.submit(class="btn btn-success col-md-6") }}
-
+        
     </form>
+    {{ ckeditor.load(pkg_type='basic') }}
+    {{ ckeditor.config(name='text', height=300, language='en', custom_config="") }}
 </div>
 
 {% endblock %}

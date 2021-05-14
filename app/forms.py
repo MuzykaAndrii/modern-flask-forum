@@ -3,7 +3,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextA
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Regexp
 from app.models import User
-# from wtforms_sqlalchemy.fields import QuerySelectField
+from flask_ckeditor import CKEditorField
 
 class NonValidatingSelectMultipleField(SelectMultipleField):
     """
@@ -44,15 +44,12 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
-class AddPhotoForm(FlaskForm):
-    picture = FileField('Add product picture', validators=[FileRequired(), FileAllowed(['jpg', 'png'])])
-    submit = SubmitField('Submit')
 
 class CreateDiscussionForm(FlaskForm):
     theme = StringField('Theme of your topic',validators=[DataRequired(message='This area is required'),
                                             Length(min=20, max=150, message='Theme of topic must be in range from 20 to 150 characters')])
-    text = TextAreaField('Your entire question or something else must be here', validators=[DataRequired(message='This area is required'),
-                                            Length(min=30, max=10000,message='Description of topic must be in range from 50 to 10 000 characters' )])
+    text = CKEditorField('Your entire question or something else must be here', validators=[DataRequired(message='This area is required'),
+                                            Length(min=20, max=10000,message='Description of topic must be in range from 20 to 10 000 characters' )])
     # theme id
     theme_id = HiddenField(validators=[DataRequired()])
 

@@ -14,7 +14,9 @@
 
             {% endfor %}
 
-            <p>{{ discussion.text }}</p>
+            {# to avoid js injections #}
+            {% set statement = '<' + 'script>' %}
+            <p>{{ discussion.text | replace(statement, '') | markup}}</p>
 
             <p class="card-text">Created by: <a href="{{ url_for('user_profile', user_id=discussion.creator.id) }}"
                     class="text-muted">{{discussion.creator.nickname}}</a></p>
