@@ -35,15 +35,13 @@
  - implement users profiles
  - implement users roles
  - create links in tags
+ - implement ckeditor
+ - customize admin page
 ------------------------------DONE-------------------------------
  - fix tags bug
 
- - watch jinja videos
-    - implement bbcode
-
  - implement topic edit request possibility
 
- - customize admin page
 
  - implement search possibility
 

@@ -237,6 +237,11 @@ class Edit_request(DbMixin, db.Model):
     target_id = db.Column(db.Integer, db.ForeignKey('discussion.id'), nullable=False)
     editor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+    def __init__(self, text, target_id, editor_id):
+        self. text = text
+        self.target_id = target_id
+        self.editor_id = editor_id
+
 class Role(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String(50), unique=True, nullable=False)

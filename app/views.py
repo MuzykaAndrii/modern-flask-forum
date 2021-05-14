@@ -1,8 +1,8 @@
 from flask import render_template, url_for, redirect, request, flash, abort
 from app import app
-from app.models import Section, Tag, Theme, Discussion, Comment, Image, User
+from app.models import Section, Tag, Theme, Discussion, Comment, Image, User, Edit_request
 from flask_login import current_user, login_required
-from app.forms import CreateDiscussionForm, CreateCommentForm, UpdateAccountForm
+from app.forms import CreateDiscussionForm, CreateCommentForm, UpdateAccountForm, EditDiscussionForm
 from datetime import datetime as dt
 
 @app.before_request
@@ -159,3 +159,35 @@ def tags_discussions(tag_slug):
                 discussions_with_tag.append(discussion)
 
     return render_template('forum/tags_discussions.html', discussions=discussions_with_tag, tag_name=tag.name, section_slug=tag.parent_section.slug)
+
+
+@app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>/edit_request', methods=['GET'])
+@login_required
+def edit_discussion(section_slug, theme_slug, discussion_id):
+    current_section = Section.get_from_slug(section_slug)
+    current_theme = Theme.get_current_theme(theme_slug, current_section.id)
+    current_discussion = Discussion.get_current_discussion(current_theme.id, discussion_id)
+
+    form = EditDiscussionForm()
+    form.text.data = current_discussion.text
+
+    return render_template('forum/create_edit_request.html', form=form, discussion=current_discussion, section_slug=section_slug, theme_slug=theme_slug)
+
+@app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>/edit_request', methods=['POST'])
+@login_required
+def save_edit_request(section_slug, theme_slug, discussion_id):
+    current_section = Section.get_from_slug(section_slug)
+    current_theme = Theme.get_current_theme(theme_slug, current_section.id)
+    current_discussion = Discussion.get_current_discussion(current_theme.id, discussion_id)
+
+    form = EditDiscussionForm()
+    if form.validate_on_submit():
+        edit_request = Edit_request(form.text.data, current_discussion.id, current_user.id)
+        try:
+            edit_request.save()
+        except:
+            flash('Something went wrong', 'error')
+
+        flash('Your edit request successfully sended!', 'success')
+
+    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id))

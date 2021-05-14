@@ -76,3 +76,9 @@ class UpdateAccountForm(FlaskForm):
     image = FileField('Update profile avatar', validators=[FileAllowed(['jpg', 'png'])])
 
     submit = SubmitField('Update info')
+
+class EditDiscussionForm(FlaskForm):
+    text = CKEditorField('Your entire edit request must be here', validators=[DataRequired(message='This area is required'),
+                                            Length(min=20, max=10000,message='Description of topic must be in range from 20 to 10 000 characters' )])
+
+    submit = SubmitField('Send request')
