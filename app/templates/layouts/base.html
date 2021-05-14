@@ -42,14 +42,14 @@
           <a href="{{ url_for('auth.register') }}" type="button" class="btn login-btn btn-secondary">Register</a>
           <a href="{{ url_for('auth.login') }}" type="button" class="btn btn-secondary">Log in</a>
           {% else %}
+          {% if current_user.has_role('admin') %}
+          <a style="margin-right: 20px;" href="/admin" type="button"
+          class="btn btn-warning">Admin panel</a>
+          {% endif %}
           <a style="margin-right: 20px;" href="{{ url_for('auth.logout') }}" type="button"
-            class="btn btn-secondary">Logout</a>
-          
-
-
-
+            class="btn btn-danger">Logout</a>
           <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
               Hello, {{ current_user.nickname }}
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
@@ -57,8 +57,6 @@
               <li><a href="{{ url_for('user_settings') }}" type="button" class="dropdown-item">Settings</a></li>
             </ul>
           </div>
-
-
 
           {% endif %}
         </form>
