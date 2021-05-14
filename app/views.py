@@ -14,7 +14,12 @@ def update_last_seen():
 @app.errorhandler(404)
 def page_not_found(e):
     # note that we set the 404 status explicitly
-    return render_template('404.html', title='Not found'), 404
+    return render_template('alerts/404.html', title='Not found'), 404
+
+@app.errorhandler(403)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('alerts/403.html', title='Accessless'), 403
 
 @app.route('/forum')
 @app.route('/')
@@ -25,14 +30,14 @@ def index():
     # get all tags
     tags = Tag.query.limit(25).all()
     
-    return render_template('main_page.html', sections=sections, tags=tags, title='Sections list')
+    return render_template('forum/main_page.html', sections=sections, tags=tags, title='Sections list')
 
 @app.route('/forum/<string:section_slug>')
 def themes_index(section_slug):
     current_section = Section.get_from_slug(section_slug)
     themes = current_section.themes
 
-    return render_template('themes.html', themes=themes, section_slug=current_section.slug, title='Themes list')
+    return render_template('forum/themes.html', themes=themes, section_slug=current_section.slug, title='Themes list')
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>')
 def discussions_index(section_slug, theme_slug):
@@ -40,7 +45,7 @@ def discussions_index(section_slug, theme_slug):
     current_theme = Theme.get_current_theme(theme_slug, current_section_id)
     discussions = current_theme.discussions
     
-    return render_template('discussions.html', discussions=discussions, section_slug=section_slug, theme_slug=current_theme.slug, title='Topics list')
+    return render_template('forum/discussions.html', discussions=discussions, section_slug=section_slug, theme_slug=current_theme.slug, title='Topics list')
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['GET'])
 def discussion(section_slug, theme_slug, discussion_id):
@@ -50,7 +55,7 @@ def discussion(section_slug, theme_slug, discussion_id):
     current_discussion = Discussion.get_current_discussion(current_theme.id, discussion_id)
     comments = current_discussion.comments.order_by(Comment.written_at.desc())
 
-    return render_template('discussion.html', comments=comments, discussion=current_discussion, title=current_discussion.theme, section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form)
+    return render_template('forum/discussion.html', comments=comments, discussion=current_discussion, title=current_discussion.theme, section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form)
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['POST'])
 @login_required
@@ -84,7 +89,7 @@ def create_topic(section_slug, theme_slug):
         topic.save()
 
         flash('Topic created successfully', 'success')
-        return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=topic.id ))
+        return redirect(url_for('forum/discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=topic.id ))
 
     #gather all needed data
     section_id = Section.get_from_slug(section_slug).id
@@ -95,7 +100,7 @@ def create_topic(section_slug, theme_slug):
     form.theme_id.data = theme_id
     form.tags.data = [(tag.id, tag.name) for tag in tags]
 
-    return render_template('create_discussion.html', title='New topic', form=form, section_slug=section_slug, theme_slug=theme_slug)
+    return render_template('forum/create_discussion.html', title='New topic', form=form, section_slug=section_slug, theme_slug=theme_slug)
 
 @app.route('/user/settings', methods=['GET'])
 @login_required
@@ -107,7 +112,7 @@ def user_settings():
     email = current_user.email
     last_seen = current_user.last_seen
 
-    return render_template('user_settings.html', form=form, email=email, last_seen=last_seen)
+    return render_template('user/user_settings.html', form=form, email=email, last_seen=last_seen)
 
 
 @app.route('/user/settings/update', methods=['POST'])
@@ -136,7 +141,7 @@ def update_user():
 def user_profile(user_id):
     user = User.query.get_or_404(user_id)
 
-    return render_template('user_profile.html', user=user)
+    return render_template('user/user_profile.html', user=user)
 
 @app.route('/forum/tag/<string:tag_slug>', methods=['GET'])
 def tags_discussions(tag_slug):
@@ -153,4 +158,4 @@ def tags_discussions(tag_slug):
             if d_tag.slug == tag_slug:
                 discussions_with_tag.append(discussion)
 
-    return render_template('tags_discussions.html', discussions=discussions_with_tag, tag_name=tag.name, section_slug=tag.parent_section.slug)
+    return render_template('forum/tags_discussions.html', discussions=discussions_with_tag, tag_name=tag.name, section_slug=tag.parent_section.slug)

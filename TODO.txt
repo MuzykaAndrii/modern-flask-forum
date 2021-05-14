@@ -49,7 +49,7 @@
 
  - add pagination to needed pages
 
- - rebuild admin panel to moderators
+ - rebuild admin panel to moderators https://stackoverflow.com/questions/44710598/flask-admin-two-admin-panels
 
  - implement bread crumbs feature
 

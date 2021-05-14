@@ -22,7 +22,7 @@
 
             {% for tag in tags %}
 
-            <a class="tag badge bg-primary">{{ tag.name }}</a>
+            <a href="{{ url_for('tags_discussions', tag_slug=tag.slug) }}" class="tag badge bg-primary">{{ tag.name }}</a>
 
             {% endfor %}
 
