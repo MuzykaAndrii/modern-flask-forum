@@ -187,6 +187,17 @@ class Discussion(DbMixin, db.Model):
     @staticmethod
     def get_current_discussion(theme_id, discussion_id):
         return Discussion.query.filter_by(theme_id=theme_id, id=discussion_id).first_or_404()
+    
+    # @staticmethod
+    # def validate_discussion(discussion_id):
+
+    #     return section_slug, theme.slug, discussion
+    
+    def build_url(self):
+        theme = self.parent_theme
+        section_slug = theme.parent_section.slug
+
+        return section_slug, theme.slug
 
     def __init__(self, theme, text, theme_id, creator_id):
         self.theme = theme

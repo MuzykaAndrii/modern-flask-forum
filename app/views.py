@@ -171,7 +171,7 @@ def edit_discussion(section_slug, theme_slug, discussion_id):
     form = EditDiscussionForm()
     form.text.data = current_discussion.text
 
-    return render_template('forum/create_edit_request.html', form=form, discussion=current_discussion, section_slug=section_slug, theme_slug=theme_slug)
+    return render_template('forum/edit/create_edit_request.html', form=form, discussion=current_discussion, section_slug=section_slug, theme_slug=theme_slug)
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>/edit_request', methods=['POST'])
 @login_required
@@ -182,7 +182,7 @@ def save_edit_request(section_slug, theme_slug, discussion_id):
 
     form = EditDiscussionForm()
     if form.validate_on_submit():
-        edit_request = Edit_request(form.text.data, current_discussion.id, current_user.id)
+        edit_request = Edit_request(form.text.data, current_discussion_id, current_user.id)
         try:
             edit_request.save()
         except:
@@ -191,3 +191,13 @@ def save_edit_request(section_slug, theme_slug, discussion_id):
         flash('Your edit request successfully sended!', 'success')
 
     return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id))
+
+@app.route('/user/edit_requests')
+@login_required
+def edit_requests_index():
+    discussions = list()
+    for discussion in current_user.created_discussions:
+        if discussion.edit_requests:
+            discussions.append(discussion)
+
+    return render_template('forum/edit/edit_requests.html', discussions=discussions)
