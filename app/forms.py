@@ -62,7 +62,7 @@ class CreateDiscussionForm(FlaskForm):
     submit = SubmitField('Create')
 
 class CreateCommentForm(FlaskForm):
-    text = TextAreaField('You can leave comment here', validators=[DataRequired(message='This area is required'),
+    text = CKEditorField('You can leave comment here', validators=[DataRequired(message='This area is required'),
                                             Length(min=2, max=10000,message='Comment must be in range from 2 to 500 characters' )])
     submit = SubmitField('Leave comment')
 

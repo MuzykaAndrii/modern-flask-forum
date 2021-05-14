@@ -100,7 +100,7 @@
                                         <h6 class="mb-1">Topic: <a href="{{ url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=comment.parent_discussion.id) }}">{{ comment.parent_discussion.theme }}</a></h6>
                                         <small>{{ comment.written_at }}</small>
                                       </div>
-                                      <p class="mb-1">{{ comment.text }}</p>
+                                      <p class="mb-1">{{ comment.text | striptags }}</p>
                                     </div>
                                     {% endfor %}
                                   </div>
