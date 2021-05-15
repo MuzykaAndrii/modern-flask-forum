@@ -37,11 +37,9 @@
  - create links in tags
  - implement ckeditor
  - customize admin page
+ - implement topic edit request possibility
 ------------------------------DONE-------------------------------
  - fix tags bug
-
- - implement topic edit request possibility
-
 
  - implement search possibility
 

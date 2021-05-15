@@ -170,6 +170,12 @@ def tags_discussions(tag_slug):
 
     return render_template('forum/tags_discussions.html', discussions=discussions_with_tag, tag_name=tag.name, section_slug=tag.parent_section.slug)
 
+# @app.route('/forum/search')
+# def search():
+#     page = request.args.get('page', 1, type=int)
+#     search_query = request.args.get('search_query')
+
+#     return render_template('forum/search.html', discussions=discussions)
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>/edit_request', methods=['GET'])
 @login_required
@@ -212,7 +218,7 @@ def edit_requests_index():
 
     return render_template('forum/edit/edit_requests.html', discussions=discussions)
 
-@app.route('/user/edit_request/<int:request_id>')
+@app.route('/user/edit_request/<int:request_id>', methods=['GET'])
 @login_required
 @is_owner_of_request
 def edit_request(request_id):
@@ -221,15 +227,27 @@ def edit_request(request_id):
 
     return render_template('forum/edit/edit_request.html', edit=edit_request, original=discussion)
 
-# @app.route('/user/edit_request/<int:request_id>/submit', methods=['POST'])
-# @login_required
-# def submit_request(request_id):
-#     edit_request = Edit_request.query.get_or_404(request_id)
+@app.route('/user/edit_request/<int:request_id>/submit', methods=['POST', 'GET'])
+@login_required
+@is_owner_of_request
+def submit_request(request_id):
+    edit_request = Edit_request.query.get(request_id)
+    discussion = edit_request.target_discussion
+    discussion.text = edit_request.text
+    discussion.save()
+    edit_request.delete()
 
-#     return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id))
 
-# @app.route('/user/edit_request/<int:request_id>/deny', methods=['POST'])
-# @login_required
-# def deny_request(request_id):
+    flash('Discussion successfully updated!', 'success')
+    section_slug, theme_slug = discussion.build_url()
+    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion.id))
 
-#     return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id))
+@app.route('/user/edit_request/<int:request_id>/deny', methods=['POST', 'GET'])
+@login_required
+@is_owner_of_request
+def deny_request(request_id):
+    edit_request = Edit_request.query.get(request_id)
+    edit_request.delete()
+    section_slug, theme_slug = discussion.build_url()
+
+    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=edit_request.target_id))

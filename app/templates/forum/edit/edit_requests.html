@@ -20,11 +20,13 @@
                     </a>
                     </h2>
                     {% for req in discussion.edit_requests %}
+                    {% if req.checked == None %}
                     <div id="collapse{{discussion.id}}" class="accordion-collapse collapse" aria-labelledby="headingOne">
                         <div class="accordion-body">
                             <a href="{{ url_for('edit_request', request_id=req.id) }}">{{ req.text | striptags | truncate(200)}}</a>
                         </div>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
                 {% endfor %}
