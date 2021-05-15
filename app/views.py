@@ -4,6 +4,16 @@ from app.models import Section, Tag, Theme, Discussion, Comment, Image, User, Ed
 from flask_login import current_user, login_required
 from app.forms import CreateDiscussionForm, CreateCommentForm, UpdateAccountForm, EditDiscussionForm
 from datetime import datetime as dt
+from functools import wraps
+
+def is_owner_of_request(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        edit_request = Edit_request.query.get_or_404(kwargs['request_id'])
+        if current_user.id != edit_request.target_discussion.creator_id:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.before_request
 def update_last_seen():
@@ -17,7 +27,7 @@ def page_not_found(e):
     return render_template('alerts/404.html', title='Not found'), 404
 
 @app.errorhandler(403)
-def page_not_found(e):
+def access_denied(e):
     # note that we set the 404 status explicitly
     return render_template('alerts/403.html', title='Accessless'), 403
 
@@ -182,7 +192,7 @@ def save_edit_request(section_slug, theme_slug, discussion_id):
 
     form = EditDiscussionForm()
     if form.validate_on_submit():
-        edit_request = Edit_request(form.text.data, current_discussion_id, current_user.id)
+        edit_request = Edit_request(form.text.data, current_discussion.id, current_user.id)
         try:
             edit_request.save()
         except:
@@ -201,3 +211,25 @@ def edit_requests_index():
             discussions.append(discussion)
 
     return render_template('forum/edit/edit_requests.html', discussions=discussions)
+
+@app.route('/user/edit_request/<int:request_id>')
+@login_required
+@is_owner_of_request
+def edit_request(request_id):
+    edit_request = Edit_request.query.get(request_id)
+    discussion = edit_request.target_discussion
+
+    return render_template('forum/edit/edit_request.html', edit=edit_request, original=discussion)
+
+# @app.route('/user/edit_request/<int:request_id>/submit', methods=['POST'])
+# @login_required
+# def submit_request(request_id):
+#     edit_request = Edit_request.query.get_or_404(request_id)
+
+#     return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id))
+
+# @app.route('/user/edit_request/<int:request_id>/deny', methods=['POST'])
+# @login_required
+# def deny_request(request_id):
+
+#     return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id))

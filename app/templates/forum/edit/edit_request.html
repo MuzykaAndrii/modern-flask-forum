@@ -1,0 +1,49 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+
+
+<div class="container">
+    <div class="row">
+
+        <h2 class="col-md-12" style="text-align: center; margin: 0 25px 0 0; border: 1px solid gray">{{ original.theme }}</h2>
+        {% set statement = '<' + 'script>' %}
+        <div style="border: 1px solid gray; margin-top: 0;" class="col-md-6">
+            <h3>Original: </h3>
+            {{ original.text | replace(statement, '') | markup }}
+        </div>
+
+        <div style="border: 1px solid gray" class="col-md-6">
+            <h3>Request: </h3>
+            {{ edit.text | replace(statement, '') | markup }}
+        </div>
+        
+        <div class="col-md-12 d-flex justify-content-center">
+            <a type="button" class="btn btn-success req-btn">Accept changes</a>
+            <a type="button" class="btn btn-danger req-btn">Deny request</a>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Authentication error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                You must have an account. Please log in or register new account.
+            </div>
+            <div class="modal-footer">
+                <a href="{{ url_for('auth.login') }}" type="button" class="btn btn-primary">Log in</a>
+                <a href="{{ url_for('auth.register') }}" type="button" class="btn btn-primary">Register</a>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+{% endblock %}

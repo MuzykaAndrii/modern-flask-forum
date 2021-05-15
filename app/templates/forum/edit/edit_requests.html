@@ -19,21 +19,15 @@
                             <span style="margin-left: 10px;" class="badge rounded-pill bg-info text-white">{{ discussion.edit_requests | length }}</span>
                     </a>
                     </h2>
-
-
                     {% for req in discussion.edit_requests %}
                     <div id="collapse{{discussion.id}}" class="accordion-collapse collapse" aria-labelledby="headingOne">
                         <div class="accordion-body">
-                            {{ req.text | striptags | truncate(200)}}
+                            <a href="{{ url_for('edit_request', request_id=req.id) }}">{{ req.text | striptags | truncate(200)}}</a>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
-
                 {% endfor %}
-
-
-
             </div>
 
         </div>
