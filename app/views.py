@@ -1,7 +1,7 @@
 from flask import render_template, url_for, redirect, request, flash, abort
 from app import app
 from app.models import Section, Tag, Theme, Discussion, Comment, Image, User, Edit_request
-from flask_login import current_user, login_required
+from flask_login import current_user, login_required, logout_user
 from app.forms import CreateDiscussionForm, CreateCommentForm, UpdateAccountForm, EditDiscussionForm
 from datetime import datetime as dt
 from functools import wraps
@@ -20,6 +20,13 @@ def update_last_seen():
     if current_user.is_authenticated:
         current_user.last_seen = dt.now()
         current_user.save()
+
+@app.before_request
+def check_banned():
+    if current_user.is_authenticated and current_user.is_banned == True:
+        ban_reason = current_user.ban_reason
+        logout_user()
+        return render_template('alerts/banned.html', reason=ban_reason)
 
 @app.errorhandler(404)
 def page_not_found(e):

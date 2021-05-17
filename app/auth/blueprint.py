@@ -53,6 +53,8 @@ def login():
             flash('Login unsuccessfull. Please check nickname and password', category='warning')
             return redirect(url_for('auth.login'))
         else:
+            if result.is_banned == True:
+                return render_template('alerts/banned.html', reason=result.ban_reason)
             flash(f'{result.nickname}, you have been logged in!', category='success')
             login_user(result, remember=form.remember.data)
             next_page = request.args.get('next')
