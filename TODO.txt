@@ -50,3 +50,10 @@
  - implement bread crumbs feature
 
  - implement anonymous comments
+    - update form model
+    - add checkbox to comment form
+    - update model
+        - set creator_id property to nullable
+        - execute migration
+    - define anonymous avatar
+    - change view

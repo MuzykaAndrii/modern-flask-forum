@@ -41,6 +41,8 @@ class User(UserMixin, DbMixin, db.Model):
     website = db.Column(db.String(120), unique=True)
     register_date = db.Column(db.DateTime, default=dt.utcnow)
     last_seen = db.Column(db.DateTime, default=dt.utcnow)
+    is_banned = db.Column(db.Boolean, default=False)
+    ban_reason = db.Column(db.String(255))
 
     # created discussions
     created_discussions = db.relationship('Discussion', backref='creator', lazy='dynamic')
