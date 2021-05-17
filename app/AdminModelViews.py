@@ -2,6 +2,7 @@ from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
 from slugify import slugify
+from wtforms import PasswordField
 
 class AdminAccess(ModelView):
     def is_accessible(self):
@@ -38,3 +39,14 @@ class TagModelView(AdminAccess):
     def on_model_change(self, form, model, is_created):
         model.slug = slugify(form.name.data)
         return super(TagModelView, self).on_model_change(form, model, is_created)
+
+class UserModelView(AdminAccess):
+    form_excluded_columns = ('password')
+    form_extra_fields = {
+        'password2': PasswordField('Password')
+    }
+
+    def on_model_change(self, form, model, is_created):
+        if form.password2.data:
+            model.hash_password(form.password2.data)
+        return super(UserModelView, self).on_model_change(form, model, is_created)

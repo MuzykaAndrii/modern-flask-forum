@@ -38,8 +38,8 @@
  - implement ckeditor
  - customize admin page
  - implement topic edit request possibility
-------------------------------DONE-------------------------------
  - fix tags bug
+------------------------------DONE-------------------------------
 
  - implement search possibility
 

@@ -58,7 +58,7 @@ class User(UserMixin, DbMixin, db.Model):
 
     # user role
     roles = db.relationship('Role', secondary=users_roles, backref=db.backref('users', lazy='select'))
-    
+
     def update_last_seen(self):
         self.last_seen = dt.now()
         self.save()
@@ -228,6 +228,9 @@ class Comment(DbMixin, db.Model):
         self.text = text
         self.discussion_id = discussion_id
         self.creator_id = creator_id
+    
+    def __repr__(self):
+        return f"<Text: '{self.text}', author: {self.creator_id}"
 
 class Tag(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)

@@ -40,6 +40,7 @@ admin.add_view(SectionModelView(Section, db.session))
 admin.add_view(ThemeModelView(Theme, db.session))
 admin.add_view(DiscussionModelView(Discussion, db.session))
 admin.add_view(TagModelView(Tag, db.session))
+admin.add_view(UserModelView(User, db.session))
 
 # use it on production within another cache settings in config file
 # app.run()
