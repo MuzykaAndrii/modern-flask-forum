@@ -1,10 +1,10 @@
 <div class="sidebar col-md-3">
     <div class="card text-dark bg-light mb-3" style="max-width: 18rem;">
         <div class="card-header">Search that you need</div>
-        <div class="card-body d-flex">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <form method="GET" action="{{ url_for('search') }}" class="card-body d-flex">
+            <input name="search_query" value="{{ request.args.get('search_query', '') }}" class="form-control me-2" type="text" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-secondary" type="submit">Search</button>
-        </div>
+        </form>
     </div>
 
     <div class="card text-white bg-dark mb-3" style="max-width: 18rem;">

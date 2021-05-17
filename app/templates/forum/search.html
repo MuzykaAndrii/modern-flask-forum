@@ -1,0 +1,92 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+
+
+<div class="container">
+    <div class="row">
+
+        <div style="margin: 25px 0;" class="list-group col-md-9">
+
+
+            {% for discussion in posts.items %}
+            {% set section_slug, theme_slug = discussion.build_url() %}
+            <a href="{{ url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion.id) }}"
+                class="list-group-item list-group-item-action" aria-current="true">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ discussion.theme }}</h5>
+                    <small>3 days ago</small>
+                </div>
+                <p class="mb-1">{{ discussion.text | truncate(100) | striptags }}</p>
+                <small>
+                    {% for tag in discussion.tags %}
+                    <span class="badge bg-secondary">{{ tag.name }}</span>
+                    {% endfor %}
+
+                </small>
+            </a>
+            {% endfor %}
+            <div style="margin-top: 20px;" class="pag text-right">
+                <!-- Pagination Links-->
+                <div class="text-right">
+                    <a href="{{ url_for('search', page=posts.prev_num, search_query=request.args.get('search_query')) }}" class="btn btn-outline-dark 
+       {% if posts.page == 1 %}disabled{% endif %}">
+                        &laquo;
+                    </a>
+                    <!-- Loop through the number of pages to display a link for each-->
+                    {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                    <!-- Check for the active page and set the link to "Active"-->
+                    {% if posts.page == page_num %}
+                    <a href="{{ url_for('search', page=page_num, search_query=request.args.get('search_query')) }}" class="btn btn-primary">
+                        {{ page_num }}
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('search', page=page_num, search_query=request.args.get('search_query')) }}" class="btn btn-dark">
+                        {{ page_num }}
+                    </a>
+                    {% endif %}
+                    {% else %}
+                    ...
+                    {% endif %}
+                    {% endfor %}
+                    <a href="{{ url_for('search', page=posts.next_num, search_query=request.args.get('search_query')) }}" class="btn btn-dark 
+       {% if posts.page == posts.pages %}disabled{% endif %}">
+                        &raquo;
+                    </a>
+                </div>
+                <p class="text-right mt-3">
+                    Showing page {{ posts.page }} of {{ posts.pages }}
+                </p>
+
+                </div>
+
+            </div>
+
+
+
+            {% include 'layouts/sidebar.html' %}
+        </div>
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Authentication error</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        You must have an account. Please log in or register new account.
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{{ url_for('auth.login') }}" type="button" class="btn btn-primary">Log in</a>
+                        <a href="{{ url_for('auth.register') }}" type="button" class="btn btn-primary">Register</a>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    {% endblock %}

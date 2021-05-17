@@ -180,12 +180,14 @@ def tags_discussions(tag_slug):
 
     return render_template('forum/tags_discussions.html', tags=get_tags(), discussions=discussions_with_tag, tag_name=tag.name, section_slug=tag.parent_section.slug)
 
-# @app.route('/forum/search')
-# def search():
-#     page = request.args.get('page', 1, type=int)
-#     search_query = request.args.get('search_query')
+@app.route('/forum/search', methods=['GET'])
+def search():
+    page = request.args.get('page', 1, type=int)
+    search_query = request.args.get('search_query')
+    discussions = Discussion.query.filter(Discussion.theme.contains(search_query) | 
+                            Discussion.text.contains(search_query) | Discussion.tags.any(name=search_query)).paginate(page=page, per_page=app.config['TOPICS_PER_PAGE'])
 
-#     return render_template('forum/search.html', discussions=discussions)
+    return render_template('forum/search.html', posts=discussions, tags=get_tags())
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>/edit_request', methods=['GET'])
 @login_required

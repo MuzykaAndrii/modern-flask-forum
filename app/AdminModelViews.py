@@ -34,7 +34,7 @@ class DiscussionModelView(AdminAccess):
     form_edit_rules = ['parent_theme', 'theme', 'text', 'tags', 'creator']
 
     def on_model_change(self, form, model, is_created):
-        model.slug = slugify(form.name.data)
+        model.slug = slugify(form.theme.data)
         return super(DiscussionModelView, self).on_model_change(form, model, is_created)
 
 class TagModelView(AdminAccess):

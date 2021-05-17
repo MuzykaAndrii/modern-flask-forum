@@ -29,6 +29,8 @@ ANON_AVATAR = USERS_PICS_DIR + 'anonymous.jpg'
 FILENAME_LENGTH = 8
 USERS_PICS_SIZE = (1000, 1000)
 
+TOPICS_PER_PAGE = 5
+
 SUPPORT_MAIL = 'myforum@gmail.com'
 
 SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'site.db')
