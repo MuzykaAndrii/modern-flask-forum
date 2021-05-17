@@ -185,7 +185,7 @@ def search():
     page = request.args.get('page', 1, type=int)
     search_query = request.args.get('search_query')
     discussions = Discussion.query.filter(Discussion.theme.contains(search_query) | 
-                            Discussion.text.contains(search_query) | Discussion.tags.any(name=search_query)).paginate(page=page, per_page=app.config['TOPICS_PER_PAGE'])
+                            Discussion.text.contains(search_query) | Discussion.tags.any(Tag.name.contains(search_query))).paginate(page=page, per_page=app.config['TOPICS_PER_PAGE'])
 
     return render_template('forum/search.html', posts=discussions, tags=get_tags())
 
