@@ -1,5 +1,5 @@
 from . import db
-from app import app
+from app import app, cache
 from datetime import datetime as dt
 from flask_login import UserMixin, current_user
 from app import login
@@ -58,6 +58,10 @@ class User(UserMixin, DbMixin, db.Model):
 
     # user role
     roles = db.relationship('Role', secondary=users_roles, backref=db.backref('users', lazy='select'))
+    
+    def update_last_seen(self):
+        self.last_seen = dt.now()
+        self.save()
 
     def get_avatar(self):
         if self.avatars.all():
@@ -74,7 +78,6 @@ class User(UserMixin, DbMixin, db.Model):
                 return True
         return False
 
-    
     def get_avatars(self):
         if self.avatars:
             return self.avatars.order_by(Image.date_upload.desc())

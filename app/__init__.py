@@ -9,10 +9,14 @@ from flask_ckeditor import CKEditor
 from flask_admin import Admin
 from app.AdminModelViews import *
 
+from flask_caching import Cache
+
 
 app = Flask(__name__)
 app.config.from_object('config')
 app.jinja_env.filters['markup'] = Markup
+
+cache = Cache(app)
 
 db = SQLAlchemy(app, metadata=metadata)
 bcrypt = Bcrypt(app)
@@ -36,3 +40,6 @@ admin.add_view(SectionModelView(Section, db.session))
 admin.add_view(ThemeModelView(Theme, db.session))
 admin.add_view(DiscussionModelView(Discussion, db.session))
 admin.add_view(TagModelView(Tag, db.session))
+
+# use it on production within another cache settings in config file
+# app.run()

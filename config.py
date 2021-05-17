@@ -1,6 +1,7 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 from sqlalchemy import MetaData
+import flask_caching
 
 convention = {
     "ix": 'ix_%(column_0_label)s',
@@ -13,6 +14,14 @@ metadata = MetaData(naming_convention=convention)
 
 WTF_CSRF_ENABLED = True
 SECRET_KEY = 'SuperSecretString'
+
+#caching in prod
+# CACHE_TYPE = 'SimpleCache'
+
+#caching in dev
+CACHE_TYPE = 'filesystem'
+CACHE_DIR = 'cache/'
+
 
 USERS_PICS_DIR = '/static/images/users_avatars/'
 DEFAULT_AVATAR = USERS_PICS_DIR + 'default.jpg'

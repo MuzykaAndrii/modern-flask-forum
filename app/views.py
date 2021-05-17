@@ -1,5 +1,5 @@
 from flask import render_template, url_for, redirect, request, flash, abort
-from app import app
+from app import app, cache
 from app.models import Section, Tag, Theme, Discussion, Comment, Image, User, Edit_request
 from flask_login import current_user, login_required, logout_user
 from app.forms import CreateDiscussionForm, CreateCommentForm, UpdateAccountForm, EditDiscussionForm
@@ -18,10 +18,10 @@ def is_owner_of_request(f):
 @app.before_request
 def update_last_seen():
     if current_user.is_authenticated:
-        current_user.last_seen = dt.now()
-        current_user.save()
+        current_user.update_last_seen()
 
 @app.before_request
+@cache.cached(timeout=60)
 def check_banned():
     if current_user.is_authenticated and current_user.is_banned == True:
         ban_reason = current_user.ban_reason
@@ -38,23 +38,24 @@ def access_denied(e):
     # note that we set the 404 status explicitly
     return render_template('alerts/403.html', title='Accessless'), 403
 
+@cache.cached(timeout=600, key_prefix='tags')
+def get_tags():
+    return Tag.query.limit(25).all()
+
 @app.route('/forum')
 @app.route('/')
 def index():
     # get all sections
     sections = Section.query.limit(7).all()
 
-    # get all tags
-    tags = Tag.query.limit(25).all()
-    
-    return render_template('forum/main_page.html', sections=sections, tags=tags, title='Sections list')
+    return render_template('forum/main_page.html', sections=sections, tags=get_tags(), title='Sections list')
 
 @app.route('/forum/<string:section_slug>')
 def themes_index(section_slug):
     current_section = Section.get_from_slug(section_slug)
     themes = current_section.themes
 
-    return render_template('forum/themes.html', themes=themes, section_slug=current_section.slug, title='Themes list')
+    return render_template('forum/themes.html', tags=get_tags(), themes=themes, section_slug=current_section.slug, title='Themes list')
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>')
 def discussions_index(section_slug, theme_slug):
@@ -62,7 +63,7 @@ def discussions_index(section_slug, theme_slug):
     current_theme = Theme.get_current_theme(theme_slug, current_section_id)
     discussions = current_theme.discussions
     
-    return render_template('forum/discussions.html', discussions=discussions, section_slug=section_slug, theme_slug=current_theme.slug, title='Topics list')
+    return render_template('forum/discussions.html', tags=get_tags(), discussions=discussions, section_slug=section_slug, theme_slug=current_theme.slug, title='Topics list')
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['GET'])
 def discussion(section_slug, theme_slug, discussion_id):
@@ -72,7 +73,7 @@ def discussion(section_slug, theme_slug, discussion_id):
     current_discussion = Discussion.get_current_discussion(current_theme.id, discussion_id)
     comments = current_discussion.comments.order_by(Comment.written_at.desc())
 
-    return render_template('forum/discussion.html', comments=comments, discussion=current_discussion, title=current_discussion.theme, section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form)
+    return render_template('forum/discussion.html', tags=get_tags(), comments=comments, discussion=current_discussion, title=current_discussion.theme, section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form)
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['POST'])
 @login_required
@@ -129,7 +130,7 @@ def user_settings():
     email = current_user.email
     last_seen = current_user.last_seen
 
-    return render_template('user/user_settings.html', form=form, email=email, last_seen=last_seen)
+    return render_template('user/user_settings.html', tags=get_tags(), form=form, email=email, last_seen=last_seen)
 
 
 @app.route('/user/settings/update', methods=['POST'])
@@ -154,11 +155,12 @@ def update_user():
 
     return redirect(url_for('user_settings'))
 
+@cache.memoize(timeout=30)
 @app.route('/user/<int:user_id>', methods=['GET'])
 def user_profile(user_id):
     user = User.query.get_or_404(user_id)
 
-    return render_template('user/user_profile.html', user=user)
+    return render_template('user/user_profile.html', tags=get_tags(), user=user)
 
 @app.route('/forum/tag/<string:tag_slug>', methods=['GET'])
 def tags_discussions(tag_slug):
@@ -175,7 +177,7 @@ def tags_discussions(tag_slug):
             if d_tag.slug == tag_slug:
                 discussions_with_tag.append(discussion)
 
-    return render_template('forum/tags_discussions.html', discussions=discussions_with_tag, tag_name=tag.name, section_slug=tag.parent_section.slug)
+    return render_template('forum/tags_discussions.html', tags=get_tags(), discussions=discussions_with_tag, tag_name=tag.name, section_slug=tag.parent_section.slug)
 
 # @app.route('/forum/search')
 # def search():
@@ -223,7 +225,7 @@ def edit_requests_index():
         if discussion.edit_requests:
             discussions.append(discussion)
 
-    return render_template('forum/edit/edit_requests.html', discussions=discussions)
+    return render_template('forum/edit/edit_requests.html', tags=get_tags(), discussions=discussions)
 
 @app.route('/user/edit_request/<int:request_id>', methods=['GET'])
 @login_required
