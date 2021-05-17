@@ -4,6 +4,11 @@ from flask_login import current_user
 from slugify import slugify
 from wtforms import PasswordField
 
+class MyAdminIndexView(AdminIndexView):
+
+    def is_accessible(self):
+        return current_user.has_role('admin')
+
 class AdminAccess(ModelView):
     def is_accessible(self):
         return current_user.has_role('admin')

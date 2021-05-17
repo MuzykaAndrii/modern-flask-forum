@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, HiddenField, SelectMultipleField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, HiddenField, SelectMultipleField, BooleanField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Regexp
 from app.models import User
@@ -64,6 +64,7 @@ class CreateDiscussionForm(FlaskForm):
 class CreateCommentForm(FlaskForm):
     text = CKEditorField('You can leave comment here', validators=[DataRequired(message='This area is required'),
                                             Length(min=2, max=10000,message='Comment must be in range from 2 to 500 characters' )])
+    anonymous = BooleanField('Anonymous')
     submit = SubmitField('Leave comment')
 
 # add image form

@@ -217,6 +217,7 @@ class Comment(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     text = db.Column(db.Text, unique=True, nullable=False)
     written_at = db.Column(db.DateTime, default=dt.utcnow)
+    anonymous = db.Column(db.Boolean, default=False)
 
     # field needed to link this model with parent section
     discussion_id = db.Column(db.Integer, db.ForeignKey('discussion.id'), nullable=False)
@@ -224,10 +225,11 @@ class Comment(DbMixin, db.Model):
     # creator id prop
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    def __init__(self, text, discussion_id, creator_id):
+    def __init__(self, text, discussion_id, creator_id, anonymous=False):
         self.text = text
         self.discussion_id = discussion_id
         self.creator_id = creator_id
+        self.anonymous = anonymous
     
     def __repr__(self):
         return f"<Text: '{self.text}', author: {self.creator_id}"

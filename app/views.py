@@ -82,7 +82,8 @@ def create_comment(section_slug, theme_slug, discussion_id):
 
     if form.validate_on_submit():
         text = form.text.data
-        comment = Comment(text, discussion_id, current_user.id)
+        anonymous = form.anonymous.data
+        comment = Comment(text, discussion_id, current_user.id, anonymous)
         comment.save()
         flash('Comment created successfully', 'success')
 

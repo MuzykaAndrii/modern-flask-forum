@@ -25,6 +25,7 @@ CACHE_DIR = 'cache/'
 
 USERS_PICS_DIR = '/static/images/users_avatars/'
 DEFAULT_AVATAR = USERS_PICS_DIR + 'default.jpg'
+ANON_AVATAR = USERS_PICS_DIR + 'anonymous.jpg'
 FILENAME_LENGTH = 8
 USERS_PICS_SIZE = (1000, 1000)
 
