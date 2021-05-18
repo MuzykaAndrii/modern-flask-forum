@@ -226,7 +226,6 @@ def edit_requests_index():
 
 @app.route('/user/edit_request/<int:request_id>', methods=['GET'])
 @login_required
-@is_owner_of_request
 def edit_request(request_id):
     edit_request = Edit_request.query.get(request_id)
     discussion = edit_request.target_discussion
@@ -262,3 +261,10 @@ def deny_request(request_id):
     flash('Edit request successfully denied', 'success')
 
     return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=edit_request.target_id))
+
+@app.route('/user/edit_requests/stats', methods=['GET'])
+def edit_requests_stat():
+    reqs = current_user.edit_requests.order_by(Edit_request.id.desc())
+    stat = current_user.get_request_stats()
+
+    return render_template('forum/edit/edit_stats.html', stat=stat, requests=reqs.all(), tags=get_tags())

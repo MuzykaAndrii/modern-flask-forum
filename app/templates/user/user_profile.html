@@ -36,6 +36,9 @@
                             {% else %}
                             <span class="badge bg-warning text-dark">user</span>
                             {% endif %}
+                    </div>
+                    <div class="user-registe">
+                        Success edits: <span class="badge bg-warning text-dark">{{ user.get_request_stats() }}%</span>
                     </div><hr>
                     <div class="user-info-desc">
                         {{ user.about }}

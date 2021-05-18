@@ -91,6 +91,10 @@ class User(UserMixin, DbMixin, db.Model):
         self.email = email
         self.hash_password(password)
     
+    def get_request_stats(self):
+        reqs = self.edit_requests
+        return round(reqs.filter(Edit_request.is_validated == True).count() / reqs.filter(Edit_request.is_validated == False).count() * 100 ,1)
+
     def hash_password(self, password):
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
     
@@ -199,6 +203,7 @@ class Discussion(DbMixin, db.Model):
     
     def get_count_of_non_validated_requests(self):
         return self.edit_requests.filter(Edit_request.is_validated==None).count()
+    
     
     def build_url(self):
         theme = self.parent_theme
