@@ -7,6 +7,7 @@
 
         <div style="margin: 25px 0;" class="list-group col-md-9">
 
+            <h3>Results for: {{request.args.get('search_query')}}</h3>
 
             {% for discussion in posts.items %}
             {% set section_slug, theme_slug = discussion.build_url() %}

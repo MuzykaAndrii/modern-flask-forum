@@ -19,6 +19,10 @@ class DbMixin(object):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+    
+    @staticmethod
+    def create_slug(target):
+        return slugify(target)
 
 
 discussion_tags = db.Table('discussion_tags', 
@@ -139,7 +143,7 @@ class Section(DbMixin, db.Model):
 
     def __init__(self, name):
         self.name = name
-        self.slug = slugify(self.name)
+        self.slug = Section.create_slug(name)
     
     def __repr__(self):
         return f"<Section: {self.name}>"
@@ -162,7 +166,7 @@ class Theme(DbMixin, db.Model):
 
     def __init__(self, name, section_id):
         self.name = name
-        self.slug = slugify(self.name)
+        self.slug = Section.create_slug(name)
         self.section_id = section_id
     
     def __repr__(self):
@@ -244,7 +248,7 @@ class Tag(DbMixin, db.Model):
 
     def __init__(self, name, section_id):
         self.name = name
-        self.slug = slugify(name)
+        self.slug = Section.create_slug(name)
         self.section_id = section_id
     
     def __repr__(self):

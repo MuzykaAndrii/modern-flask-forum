@@ -46,6 +46,10 @@
           <a style="margin-right: 20px;" href="/admin" type="button"
           class="btn btn-warning">Admin panel</a>
           {% endif %}
+          {% if current_user.has_role('moderator') %}
+          <a style="margin-right: 20px;" href="/moder" type="button"
+          class="btn btn-warning">Moder panel</a>
+          {% endif %}
           <a style="margin-right: 20px;" href="{{ url_for('auth.logout') }}" type="button"
             class="btn btn-danger">Logout</a>
           <div class="dropdown">

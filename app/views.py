@@ -260,6 +260,7 @@ def submit_request(request_id):
 def deny_request(request_id):
     edit_request = Edit_request.query.get(request_id)
     edit_request.delete()
+    discussion = Discussion.query.get_or_404(edit_request.target_id)
     section_slug, theme_slug = discussion.build_url()
 
     return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=edit_request.target_id))

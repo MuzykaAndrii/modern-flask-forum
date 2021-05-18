@@ -47,8 +47,11 @@
         {{ form.submit(class="btn btn-success col-md-6") }}
         
     </form>
-    {{ ckeditor.load(pkg_type='basic') }}
-    {{ ckeditor.config(name='text', height=300, language='en', custom_config="") }}
+    {{ ckeditor.load(pkg_type='full') }}
+    {{ ckeditor.config(name='text', height=335, language='en', custom_config="") }}
+
+    
+
 </div>
 
 {% endblock %}

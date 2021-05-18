@@ -16,17 +16,16 @@ class NonValidatingSelectMultipleField(SelectMultipleField):
 class RegistrationForm(FlaskForm):
     nickname = StringField('nickname', validators=[Length(min=4, max=25, 
                             message='nickname length must be in range from 4 to 25 characters'),
-                            DataRequired(message='This area is required'), Regexp('[A-Za-z][A-Za-z0-9_.]*$', 0, 'Unexpected charachter in nickname')])
+                            DataRequired(message='This area is required'), Regexp('[A-Za-z][A-Za-z0-9_.]*$', 0,
+                            'Unexpected charachter in nickname')])
 
     email = StringField('Email', validators=[DataRequired(), Email()])
 
     password = PasswordField('Password', validators=[Length(min=6, 
-                            message='Password should be bigger than 6 characters'), 
-                            DataRequired(message='This area is required')])
+                            message='Password should be bigger than 6 characters'), DataRequired(message='This area is required')])
 
     confirm_password = PasswordField('Confirm Password',
-                            validators=[DataRequired(message='This area is required'), 
-                            EqualTo('password')])
+                            validators=[DataRequired(message='This area is required'), EqualTo('password')])
     submit = SubmitField('Sign up')
 
     def validate_email(self, field):
@@ -67,7 +66,6 @@ class CreateCommentForm(FlaskForm):
     anonymous = BooleanField('Anonymous')
     submit = SubmitField('Leave comment')
 
-# add image form
 
 # update info form
 class UpdateAccountForm(FlaskForm):

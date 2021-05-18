@@ -1,0 +1,25 @@
+{% extends 'admin/base.html' %}
+
+{% block head_css %}
+{{ super() }}
+<style>
+    .container {
+        max-width: 1920px;
+    }
+
+    .col-about {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block brand %}
+<li class='nav-link'><a style="color: silver" href="{{url_for('index')}}">To forum</a></li>
+{% endblock %}
+
+{% block body %}
+<div style="text-align: center;">
+<h2>Hello in administrator dashboard!</h2>
+<p>Click on model in navbar to update them</p>
+</div>
+{% endblock %}
