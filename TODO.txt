@@ -48,11 +48,10 @@
     - define anonymous avatar
     - change view
  - implement search possibility
+ - rebuild admin panel to moderators
 ------------------------------DONE-------------------------------
-
 
  - add pagination to needed pages - part done
 
- - rebuild admin panel to moderators https://stackoverflow.com/questions/31154120/how-can-i-both-register-blueprint-and-add-that-app-to-flask-admin
 
  - implement bread crumbs feature

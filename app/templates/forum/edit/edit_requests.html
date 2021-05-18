@@ -17,15 +17,17 @@
                         <a href="{{ url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion.id) }}" class="accordion-button" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapse{{discussion.id}}" aria-expanded="true" aria-controls="collapseOne">
                             {{ discussion.theme }}
-                            <span style="margin-left: 10px;" class="badge rounded-pill bg-info text-white">{{ discussion.edit_requests | length }}</span>
+                            <span style="margin-left: 10px;" class="badge rounded-pill bg-info text-white">{{ discussion.get_count_of_non_validated_requests() }}</span>
                     </a>
                     </h2>
                     {% for req in discussion.edit_requests %}
+                    {% if req.is_validated == None %}
                     <div id="collapse{{discussion.id}}" class="accordion-collapse collapse" aria-labelledby="headingOne">
                         <div class="accordion-body">
                             <a href="{{ url_for('edit_request', request_id=req.id) }}">{{ req.text | striptags | truncate(200)}}</a>
                         </div>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
                 {% endfor %}

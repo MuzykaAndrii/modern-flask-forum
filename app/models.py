@@ -191,16 +191,14 @@ class Discussion(DbMixin, db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     # stores requests to edit topic
-    edit_requests = db.relationship('Edit_request', backref='target_discussion', lazy='select')
+    edit_requests = db.relationship('Edit_request', backref='target_discussion', lazy='dynamic')
 
     @staticmethod
     def get_current_discussion(theme_id, discussion_id):
         return Discussion.query.filter_by(theme_id=theme_id, id=discussion_id).first_or_404()
     
-    # @staticmethod
-    # def validate_discussion(discussion_id):
-
-    #     return section_slug, theme.slug, discussion
+    def get_count_of_non_validated_requests(self):
+        return self.edit_requests.filter(Edit_request.is_validated==None).count()
     
     def build_url(self):
         theme = self.parent_theme
@@ -261,6 +259,7 @@ class Edit_request(DbMixin, db.Model):
 
     target_id = db.Column(db.Integer, db.ForeignKey('discussion.id'), nullable=False)
     editor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    is_validated = db.Column(db.Boolean, default=None)
 
     def __init__(self, text, target_id, editor_id):
         self. text = text

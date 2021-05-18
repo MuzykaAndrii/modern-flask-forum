@@ -68,9 +68,8 @@ def discussions_index(section_slug, theme_slug):
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['GET'])
 def discussion(section_slug, theme_slug, discussion_id):
     form = CreateCommentForm()
-    current_section = Section.get_from_slug(section_slug)
-    current_theme = Theme.get_current_theme(theme_slug, current_section.id)
-    current_discussion = Discussion.get_current_discussion(current_theme.id, discussion_id)
+    current_discussion = Discussion.query.get_or_404(discussion_id)
+    section_slug, theme_slug = current_discussion.build_url()
     comments = current_discussion.comments.order_by(Comment.written_at.desc())
 
     return render_template('forum/discussion.html', tags=get_tags(), comments=comments, discussion=current_discussion, title=current_discussion.theme, section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form)
@@ -192,9 +191,8 @@ def search():
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>/edit_request', methods=['GET'])
 @login_required
 def edit_discussion(section_slug, theme_slug, discussion_id):
-    current_section = Section.get_from_slug(section_slug)
-    current_theme = Theme.get_current_theme(theme_slug, current_section.id)
-    current_discussion = Discussion.get_current_discussion(current_theme.id, discussion_id)
+    current_discussion = Discussion.query.get_or_404(discussion_id)
+    section_slug, theme_slug = current_discussion.build_url()
 
     form = EditDiscussionForm()
     form.text.data = current_discussion.text
@@ -204,9 +202,8 @@ def edit_discussion(section_slug, theme_slug, discussion_id):
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>/edit_request', methods=['POST'])
 @login_required
 def save_edit_request(section_slug, theme_slug, discussion_id):
-    current_section = Section.get_from_slug(section_slug)
-    current_theme = Theme.get_current_theme(theme_slug, current_section.id)
-    current_discussion = Discussion.get_current_discussion(current_theme.id, discussion_id)
+    current_discussion = Discussion.query.get_or_404(discussion_id)
+    section_slug, theme_slug = current_discussion.build_url()
 
     form = EditDiscussionForm()
     if form.validate_on_submit():
@@ -218,15 +215,12 @@ def save_edit_request(section_slug, theme_slug, discussion_id):
 
         flash('Your edit request successfully sended!', 'success')
 
-    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id))
+    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=current_discussion.id))
 
 @app.route('/user/edit_requests')
 @login_required
 def edit_requests_index():
-    discussions = list()
-    for discussion in current_user.created_discussions:
-        if discussion.edit_requests:
-            discussions.append(discussion)
+    discussions = current_user.created_discussions.filter(Discussion.edit_requests.any(Edit_request.is_validated==None)).all()
 
     return render_template('forum/edit/edit_requests.html', tags=get_tags(), discussions=discussions)
 
@@ -243,11 +237,13 @@ def edit_request(request_id):
 @login_required
 @is_owner_of_request
 def submit_request(request_id):
-    edit_request = Edit_request.query.get(request_id)
+    edit_request = Edit_request.query.get_or_404(request_id)
     discussion = edit_request.target_discussion
     discussion.text = edit_request.text
+
+    edit_request.is_validated = True
     discussion.save()
-    edit_request.delete()
+    edit_request.save()
 
 
     flash('Discussion successfully updated!', 'success')
@@ -258,9 +254,11 @@ def submit_request(request_id):
 @login_required
 @is_owner_of_request
 def deny_request(request_id):
-    edit_request = Edit_request.query.get(request_id)
-    edit_request.delete()
-    discussion = Discussion.query.get_or_404(edit_request.target_id)
-    section_slug, theme_slug = discussion.build_url()
+    edit_request = Edit_request.query.get_or_404(request_id)
+    edit_request.is_validated = False
+    edit_request.save()
+
+    section_slug, theme_slug = edit_request.target_discussion.build_url()
+    flash('Edit request successfully denied', 'success')
 
     return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=edit_request.target_id))
