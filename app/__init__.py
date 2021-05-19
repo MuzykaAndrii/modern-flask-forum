@@ -3,18 +3,21 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from config import metadata
-
 from flask_ckeditor import CKEditor
 
 from flask_admin import Admin
 
 from flask_caching import Cache
 
+from flask_debugtoolbar import DebugToolbarExtension
+
 app = Flask(__name__)
 app.config.from_object('config')
 app.jinja_env.filters['markup'] = Markup
 
 cache = Cache(app)
+
+toolbar = DebugToolbarExtension(app)
 
 db = SQLAlchemy(app, metadata=metadata)
 bcrypt = Bcrypt(app)
