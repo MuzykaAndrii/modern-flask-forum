@@ -14,7 +14,7 @@ class AdminAccess(ModelView):
 class AdminMixin(AdminAccess, ModelView):
     def on_model_change(self, form, model, is_created):
         model.slug = model.create_slug(form.name.data)
-        return super(SectionModelView, self).on_model_change(form, model, is_created)
+        return super(ModelView, self).on_model_change(form, model, is_created)
     
 
 class SectionModelView(AdminMixin):

@@ -93,7 +93,12 @@ class User(UserMixin, DbMixin, db.Model):
     
     def get_request_stats(self):
         reqs = self.edit_requests
-        return round(reqs.filter(Edit_request.is_validated == True).count() / reqs.filter(Edit_request.is_validated == False).count() * 100 ,1)
+        success = reqs.filter(Edit_request.is_validated == True).count()
+        all_reqs = reqs.filter(Edit_request.is_validated == False).count()
+        if all_reqs > 0:
+            return round(success / all_reqs * 100 ,1)
+        else:
+            return False
 
     def hash_password(self, password):
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
