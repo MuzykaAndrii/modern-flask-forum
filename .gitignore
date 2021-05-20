@@ -1,6 +1,6 @@
 # Byte-compiled / optimized / DLL files
 cache/
-app/static/images/users_avatars*
+app/static/images — копия
 __pycache__/
 *.py[cod]
 *$py.class
