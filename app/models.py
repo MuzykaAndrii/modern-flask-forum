@@ -42,7 +42,7 @@ class User(UserMixin, DbMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(70), nullable=False)
     about = db.Column(db.Text, default='Hi everyone!')
-    website = db.Column(db.String(120), unique=True)
+    website = db.Column(db.String(120))
     register_date = db.Column(db.DateTime, default=dt.utcnow)
     last_seen = db.Column(db.DateTime, default=dt.utcnow)
     is_banned = db.Column(db.Boolean, default=False)
