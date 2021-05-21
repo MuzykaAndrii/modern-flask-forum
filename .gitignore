@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
+/config.py
 cache/
-app/static/images — копия
+app/static/images*
 __pycache__/
 *.py[cod]
 *$py.class
