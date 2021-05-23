@@ -12,28 +12,26 @@ convention = {
 }
 metadata = MetaData(naming_convention=convention)
 
-WTF_CSRF_ENABLED = True
-SECRET_KEY = 'SuperSecretString'
+class Config:
+    WTF_CSRF_ENABLED = True
+    USERS_PICS_DIR = '/static/images/users_avatars/'
+    DEFAULT_AVATAR = USERS_PICS_DIR + 'default.jpg'
+    ANON_AVATAR = USERS_PICS_DIR + 'anonymous.jpg'
+    FILENAME_LENGTH = 8
+    USERS_PICS_SIZE = (1000, 1000)
+    TOPICS_PER_PAGE = 5
+    SUPPORT_MAIL = 'myforum@gmail.com'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-#caching in prod
-# CACHE_TYPE = 'SimpleCache'
+class DevConfig(Config):
+    CACHE_TYPE = 'filesystem'
+    CACHE_DIR = 'cache/'
+    SECRET_KEY = 'SuperSecretString'
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'site.db'))
+    
 
-#caching in dev
-CACHE_TYPE = 'filesystem'
-CACHE_DIR = 'cache/'
+class ProdConfig(Config):
+    CACHE_TYPE = 'SimpleCache'
+    SQLALCHEMY_DATABASE_URI = os.getenv('HEROKU_POSTGRESQL_AMBER_URL', '')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'uyzdkgruyvgkxudyrgvkydgkruyfgkdzyrgkfygvkdrygvk')
 
-
-USERS_PICS_DIR = '/static/images/users_avatars/'
-DEFAULT_AVATAR = USERS_PICS_DIR + 'default.jpg'
-ANON_AVATAR = USERS_PICS_DIR + 'anonymous.jpg'
-FILENAME_LENGTH = 8
-USERS_PICS_SIZE = (1000, 1000)
-
-TOPICS_PER_PAGE = 5
-
-SUPPORT_MAIL = 'myforum@gmail.com'
-# dev
-SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'site.db')
-# deploy
-# SQLALCHEMY_DATABASE_URI ='postgres://awylbfteqmpjeh:aa26880174414faa48b1d80f63c5355715b3e90ddadea34b33bd01d66b0648da@ec2-54-160-96-70.compute-1.amazonaws.com:5432/d5rve33l1omers'
-SQLALCHEMY_TRACK_MODIFICATIONS = False

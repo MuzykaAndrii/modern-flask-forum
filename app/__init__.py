@@ -4,15 +4,14 @@ from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from config import metadata
 from flask_ckeditor import CKEditor
-
 from flask_admin import Admin
-
 from flask_caching import Cache
-
 from flask_debugtoolbar import DebugToolbarExtension
+import os
 
 app = Flask(__name__)
-app.config.from_object('config')
+env_config = os.getenv('APP_SETTINGS', 'config.DevConfig')
+app.config.from_object(env_config)
 app.jinja_env.filters['markup'] = Markup
 
 cache = Cache(app)

@@ -1,5 +1,4 @@
 # Byte-compiled / optimized / DLL files
-/config.py
 cache/
 app/static/images*
 __pycache__/
