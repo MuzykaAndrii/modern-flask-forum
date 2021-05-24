@@ -269,3 +269,21 @@ def edit_requests_stat():
     stat = current_user.get_request_stats()
 
     return render_template('forum/edit/edit_stats.html', stat=stat, requests=reqs.all(), tags=get_tags())
+
+from sqlalchemy import func
+@app.route('/forum/users')
+def list_users():
+    page = request.args.get('page', 1, type=int)
+
+    users = User.query.join(User.created_comments).\
+                        group_by(User.id).\
+                        order_by(func.count().desc()).\
+                        paginate(page=page, per_page=app.config['USERS_PER_PAGE'])
+    
+    
+    return render_template('user/users.html', users=users)
+
+@app.route('/forum/popular_topics')
+def hot_topics():
+    
+    return render_template('forum/best_discussions.html')

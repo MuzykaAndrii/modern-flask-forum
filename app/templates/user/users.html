@@ -1,0 +1,88 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+
+
+<div class="container">
+
+    <div class="row">
+        <div style="margin-top: 25px;" class="col-md-9 list-group list-group-numbered">
+
+            {% for user in users.items %}
+
+            <div style="margin: 10px" class="card">
+                <div class="row g-0">
+                    <div class="col-md-2 user-info">
+
+                        <div class="img-wrapper">
+                            <img class="img-fluid user-icon" src="{{ user.get_avatar() }}">
+                        </div>
+                        <div style="margin-left: 13px;">
+                            <small class="text-muted">{{ user.last_seen.date() }}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="card-body d-flex justify-content-between">
+                            <div>
+                                <h5 class="card-title"><a
+                                        href="{{ url_for('user_profile', user_id=user.id) }}">{{ user.nickname }}</a>
+                                </h5>
+                                <p class="card-text">{{ user.about | truncate(100) }}</p>
+                            </div>
+                            <div>
+                                <p class="card-text">Comments: <small class="text-muted">{{ user.created_comments.count() }}</small></p>
+                                <p class="card-text">Created requests: {{ user.edit_requests.count() }}</p>
+                                <p class="card-text">Photos: {{ user.avatars.count() }}</p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+
+
+
+            <!-- Pagination Links-->
+            <div class="text-right">
+                <a href="{{ url_for('list_users', page=users.prev_num) }}" class="btn btn-outline-dark 
+   {% if users.page == 1 %}disabled{% endif %}">
+                    &laquo;
+                </a>
+                <!-- Loop through the number of pages to display a link for each-->
+                {% for page_num in users.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                {% if page_num %}
+                <!-- Check for the active page and set the link to "Active"-->
+                {% if users.page == page_num %}
+                <a href="{{ url_for('list_users', page=page_num) }}" class="btn btn-primary">
+                    {{ page_num }}
+                </a>
+                {% else %}
+                <a href="{{ url_for('list_users', page=page_num) }}" class="btn btn-dark">
+                    {{ page_num }}
+                </a>
+                {% endif %}
+                {% else %}
+                ...
+                {% endif %}
+                {% endfor %}
+                <a href="{{ url_for('list_users', page=users.next_num) }}" class="btn btn-dark 
+   {% if users.page == users.pages %}disabled{% endif %}">
+                    &raquo;
+                </a>
+            </div>
+            <p class="text-right mt-3">
+                Showing page {{ users.page }} of {{ users.pages }}
+            </p>
+
+        </div>
+
+
+        {% include 'layouts/sidebar.html' %}
+
+
+    </div>
+
+</div>
+
+{% endblock %}
