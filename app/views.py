@@ -272,6 +272,7 @@ def edit_requests_stat():
     return render_template('forum/edit/edit_stats.html', stat=stat, requests=reqs.all(), tags=get_tags())
 
 
+@cache.cached(timeout=120)
 @app.route('/forum/users')
 def list_users():
     page = request.args.get('page', 1, type=int)
@@ -284,6 +285,7 @@ def list_users():
 
     return render_template('user/users.html', users=users, tags=get_tags())
 
+@cache.cached(timeout=120)
 @app.route('/forum/popular_topics')
 def hot_topics():
     page = request.args.get('page', 1, type=int)
