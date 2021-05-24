@@ -14,7 +14,7 @@
                     <h5 class="mb-1">{{ discussion.theme }}</h5>
                     <small>3 days ago</small>
                 </div>
-                <p class="mb-1">{{ discussion.text | truncate(100) }}</p>
+                <p class="mb-1">{{ discussion.text | truncate(100) | striptags }}</p>
                 <small>
                     {% for tag in discussion.tags %}
                     <span class="badge bg-secondary">{{ tag.name }}</span>

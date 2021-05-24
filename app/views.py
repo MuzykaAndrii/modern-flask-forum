@@ -183,8 +183,9 @@ def tags_discussions(tag_slug):
 def search():
     page = request.args.get('page', 1, type=int)
     search_query = request.args.get('search_query')
-    discussions = Discussion.query.filter(Discussion.theme.contains(search_query) | 
-                            Discussion.text.contains(search_query) | Discussion.tags.any(Tag.name.contains(search_query))).paginate(page=page, per_page=app.config['TOPICS_PER_PAGE'])
+    search_query = f'%{search_query}%'
+    discussions = Discussion.query.filter(Discussion.theme.ilike(search_query) | 
+                            Discussion.text.ilike(search_query) | Discussion.tags.any(Tag.name.ilike(search_query))).paginate(page=page, per_page=app.config['TOPICS_PER_PAGE'])
 
     return render_template('forum/search.html', posts=discussions, tags=get_tags())
 
