@@ -20,6 +20,7 @@ class Config:
     FILENAME_LENGTH = 8
     USERS_PICS_SIZE = (1000, 1000)
     TOPICS_PER_PAGE = 5
+    BESTS_PER_PAGE = 9
     USERS_PER_PAGE = 5 
     SUPPORT_MAIL = 'myforum@gmail.com'
     SQLALCHEMY_TRACK_MODIFICATIONS = False

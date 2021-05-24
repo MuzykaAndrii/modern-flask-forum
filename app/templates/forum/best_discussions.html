@@ -1,0 +1,78 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+
+
+<div class="container">
+
+    <div class="row">
+        <div style="margin-top: 25px;" class="col-md-9">
+
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for discussion in discussions.items %}
+                {% set section_slug, theme_slug = discussion.build_url() %}
+
+                <div class="col">
+                    <div style="margin: 0" class="card">
+                        <div class="card-body">
+                            <a class="link-secondary"
+                                href="{{ url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion.id) }}">
+                                <h5 class="card-title">{{ discussion.theme }}</h5>
+                            </a>
+                            <p class="card-text">{{ discussion.text | truncate(150) | striptags }}</p>
+                            <h6 class="card-subtitle mb-2 text-muted">From: <a
+                                    href="{{ url_for('discussions_index', section_slug=section_slug, theme_slug=theme_slug) }}">{{ discussion.parent_theme.name }}</a>
+                            </h6>
+                        </div>
+                        <div class="card-footer">
+                            <small class="text-muted">Last comment: {{discussion.get_last_comment_time()}}</small>
+                        </div>
+                    </div>
+                </div>
+
+                {% endfor %}
+            </div>
+
+            <!-- Pagination Links-->
+            <div style="margin-top: 25px;" class="text-right">
+                <a href="{{ url_for('hot_topics', page=discussions.prev_num) }}" class="btn btn-outline-dark 
+   {% if discussions.page == 1 %}disabled{% endif %}">
+                    &laquo;
+                </a>
+                <!-- Loop through the number of pages to display a link for each-->
+                {% for page_num in discussions.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                {% if page_num %}
+                <!-- Check for the active page and set the link to "Active"-->
+                {% if discussions.page == page_num %}
+                <a href="{{ url_for('hot_topics', page=page_num) }}" class="btn btn-primary">
+                    {{ page_num }}
+                </a>
+                {% else %}
+                <a href="{{ url_for('hot_topics', page=page_num) }}" class="btn btn-dark">
+                    {{ page_num }}
+                </a>
+                {% endif %}
+                {% else %}
+                ...
+                {% endif %}
+                {% endfor %}
+                <a href="{{ url_for('hot_topics', page=discussions.next_num) }}" class="btn btn-dark 
+   {% if discussions.page == discussions.pages %}disabled{% endif %}">
+                    &raquo;
+                </a>
+            </div>
+            <p class="text-right mt-3">
+                Showing page {{ discussions.page }} of {{ discussions.pages }}
+            </p>
+
+        </div>
+
+
+        {% include 'layouts/sidebar.html' %}
+
+
+    </div>
+
+</div>
+
+
+{% endblock %}

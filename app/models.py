@@ -202,6 +202,9 @@ class Discussion(DbMixin, db.Model):
     # stores requests to edit topic
     edit_requests = db.relationship('Edit_request', backref='target_discussion', lazy='dynamic')
 
+    def get_last_comment_time(self):
+        return self.comments.order_by(Comment.written_at.desc()).first().written_at.date()
+
     @staticmethod
     def get_current_discussion(theme_id, discussion_id):
         return Discussion.query.filter_by(theme_id=theme_id, id=discussion_id).first_or_404()

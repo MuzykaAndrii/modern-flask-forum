@@ -5,6 +5,7 @@ from flask_login import current_user, login_required, logout_user
 from app.forms import CreateDiscussionForm, CreateCommentForm, UpdateAccountForm, EditDiscussionForm
 from datetime import datetime as dt
 from functools import wraps
+from sqlalchemy import func
 
 def is_owner_of_request(f):
     @wraps(f)
@@ -270,7 +271,7 @@ def edit_requests_stat():
 
     return render_template('forum/edit/edit_stats.html', stat=stat, requests=reqs.all(), tags=get_tags())
 
-from sqlalchemy import func
+
 @app.route('/forum/users')
 def list_users():
     page = request.args.get('page', 1, type=int)
@@ -280,10 +281,16 @@ def list_users():
                         order_by(func.count().desc()).\
                         paginate(page=page, per_page=app.config['USERS_PER_PAGE'])
     
-    
-    return render_template('user/users.html', users=users)
+
+    return render_template('user/users.html', users=users, tags=get_tags())
 
 @app.route('/forum/popular_topics')
 def hot_topics():
-    
-    return render_template('forum/best_discussions.html')
+    page = request.args.get('page', 1, type=int)
+
+    discussions = Discussion.query.join(Discussion.comments).\
+                        group_by(Discussion.id).\
+                        order_by(func.count().desc()).\
+                        paginate(page=page, per_page=app.config['BESTS_PER_PAGE'])
+
+    return render_template('forum/best_discussions.html', discussions=discussions, tags=get_tags())
