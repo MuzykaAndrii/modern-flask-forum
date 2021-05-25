@@ -14,7 +14,7 @@
                     <div class="col-md-2 user-info">
 
                         <div class="img-wrapper">
-                            <img class="img-fluid user-icon" src="{{ user.get_avatar() }}">
+                            <img class="img-fluid user-icon" src="{{ url_for('get_avatar', user_id=user.id) }}">
                         </div>
                         <div style="margin-left: 13px;">
                             <small class="text-muted">{{ user.last_seen.date() }}</small>

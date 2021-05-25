@@ -9,7 +9,7 @@
             <div class="d-flex">
                 <div class="user-main">
                     <div class="avatar" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                        <img class="" src="{{ user.get_avatar() }}" alt="">
+                        <img class="" src="{{ url_for('get_avatar', user_id=user.id) }}" alt="">
                     </div>
                     <h2 class="">{{ user.nickname }}</h2>
                 </div>
@@ -136,9 +136,9 @@
             <div class="modal-body">
                 <div id="carouselExampleControls" class="carousel carousel-dark slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
-                        {% for img in user.get_avatars() %}
+                        {% for img in user.get_images() %}
                         <div class="carousel-item{% if loop.first %} active{% endif %}">
-                            <img style="height: 80vh" src="{{ img.get_path() }}" class="d-block mx-auto" alt="...">
+                            <img style="height: 80vh" src="{{ url_for('get_image', image_id=img.id) }}" class="d-block mx-auto" alt="...">
 
                         </div>
                         {% endfor %}

@@ -67,11 +67,10 @@ class User(UserMixin, DbMixin, db.Model):
         self.last_seen = dt.now()
         self.save()
 
-    def get_avatar(self):
+    def get_images(self):
         if self.avatars.all():
-            return app.config['USERS_PICS_DIR'] + self.avatars.order_by(Image.date_upload.desc()).first().name
-        else:
-            return app.config['DEFAULT_AVATAR']
+            return self.avatars.order_by(Image.date_upload.desc()).all()
+        
     
     def last_comments(self):
         return self.created_comments.order_by(Comment.written_at.desc()).limit(5).all()
@@ -98,7 +97,7 @@ class User(UserMixin, DbMixin, db.Model):
         if all_reqs > 0:
             return round(success / all_reqs * 100 ,1)
         else:
-            return False
+            return 'Not yet have'
 
     def hash_password(self, password):
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -113,6 +112,7 @@ class Image(DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String, unique=True, nullable=False)
     date_upload = db.Column(db.DateTime, default=dt.utcnow)
+    data = db.Column(db.LargeBinary)
 
     # links this model with user
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -123,10 +123,11 @@ class Image(DbMixin, db.Model):
     def __init__(self, user_id, form_image):
         self.user_id = user_id
         self.name = gen_filename(form_image.filename, app.config['FILENAME_LENGTH'])
-        save_picture(form_image, self.name, app.root_path + app.config['USERS_PICS_DIR'], app.config['USERS_PICS_SIZE'])
+        # save_picture(form_image, self.name, app.root_path + app.config['USERS_PICS_DIR'], app.config['USERS_PICS_SIZE'])
+        self.data = form_image.read()
     
     def delete(self):
-        delete_file(app.root_path + app.config['USERS_PICS_DIR'] + self.name)
+        # delete_file(app.root_path + app.config['USERS_PICS_DIR'] + self.name)
         db.session.delete(self)
         db.session.commit()
     

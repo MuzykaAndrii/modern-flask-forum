@@ -296,3 +296,22 @@ def hot_topics():
                         paginate(page=page, per_page=app.config['BESTS_PER_PAGE'])
 
     return render_template('forum/best_discussions.html', discussions=discussions, tags=get_tags())
+
+
+from io import BytesIO
+from flask import send_file
+
+@app.route('/avatar/<int:user_id>')
+def get_avatar(user_id):
+    file_data = Image.query.filter_by(user_id=user_id).order_by(Image.date_upload.desc()).first()
+    if file_data:
+        return send_file(BytesIO(file_data.data), attachment_filename=file_data.name)
+    else:
+        file_data = Image.query.filter_by(id=2).order_by(Image.date_upload).first()
+        return send_file(BytesIO(file_data.data), attachment_filename=file_data.name)
+
+@app.route('/images/<int:image_id>')
+def get_image(image_id):
+    file_data = Image.query.filter_by(id=image_id).order_by(Image.date_upload).first()
+
+    return send_file(BytesIO(file_data.data), attachment_filename=file_data.name)

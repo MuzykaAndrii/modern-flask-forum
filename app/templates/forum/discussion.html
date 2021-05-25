@@ -105,7 +105,7 @@
                     <div class="col-md-2 user-info">
 
                         <div class="img-wrapper">
-                            <img class="img-fluid user-icon" src="{{ comment.creator.get_avatar() }}">
+                            <img class="img-fluid user-icon" src="{{ url_for('get_avatar', user_id=comment.creator.id) }}">
                         </div>
                         <div style="margin-left: 13px;">
                             <small class="text-muted">{{ comment.creator.last_seen.date() }}</small>
