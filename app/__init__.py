@@ -7,6 +7,8 @@ from flask_ckeditor import CKEditor
 from flask_admin import Admin
 from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
+from itsdangerous import URLSafeTimedSerializer
+from flask_mail import Mail
 import os
 
 app = Flask(__name__)
@@ -14,6 +16,8 @@ env_config = os.getenv('APP_SETTINGS', 'config.DevConfig')
 app.config.from_object(env_config)
 app.jinja_env.filters['markup'] = Markup
 
+mail = Mail(app)
+url_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 cache = Cache(app)
 
 toolbar = DebugToolbarExtension(app)
@@ -61,3 +65,5 @@ moder = Admin(
 moder.add_view(UserModerModelView(User, db.session))
 moder.add_view(ThemeModerModelView(Theme, db.session))
 moder.add_view(CommentModerModelView(Comment, db.session))
+moder.add_view(TagModerModelView(Tag, db.session))
+moder.add_view(DiscussionModerModelView(Discussion, db.session))

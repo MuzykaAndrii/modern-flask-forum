@@ -40,6 +40,7 @@ class User(UserMixin, DbMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     nickname = db.Column(db.String(30), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    email_confirmed = db.Column(db.Boolean, default=False)
     password = db.Column(db.String(70), nullable=False)
     about = db.Column(db.Text, default='Hi everyone!')
     website = db.Column(db.String(120))

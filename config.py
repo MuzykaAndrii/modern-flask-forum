@@ -24,8 +24,21 @@ class Config:
     USERS_PER_PAGE = 4
     SUPPORT_MAIL = 'myforum@gmail.com'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # email conf
+    TESTING = False
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 465
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_USERNAME')
+    MAIL_MAX_EMAILS = None
+    #MAIL_SUPPRESS_SEND = False
+    MAIL_ASCII_ATTACHMENTS = False
 
 class DevConfig(Config):
+    DEBUG = True
     CACHE_TYPE = 'filesystem'
     CACHE_DIR = 'cache/'
     SECRET_KEY = 'SuperSecretString'
@@ -33,6 +46,7 @@ class DevConfig(Config):
     
 
 class ProdConfig(Config):
+    DEBUG = False
     CACHE_TYPE = 'SimpleCache'
     SQLALCHEMY_DATABASE_URI = os.getenv('HEROKU_POSTGRESQL_AMBER_URL', '')
     SECRET_KEY = os.getenv('SECRET_KEY', 'uyzdkgruyvgkxudyrgvkydgkruyfgkdzyrgkfygvkdrygvk')

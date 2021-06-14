@@ -22,14 +22,13 @@ class ModerMixin(ModelView):
         return super(ModelView, self).get_url(endpoint, **kwargs)
 
 class UserModerModelView(ModerMixin):
-    form_edit_rules = ['nickname', 'email', 'is_banned', 'ban_reason', 'last_seen', 'register_date', 'roles']
-    form_excluded_columns = ('password', 'website', 'about', 'edit_requests', 'avatars', 'created_comments', 'created_discussions')
-    column_searchable_list = ['nickname', 'email']
+    column_searchable_list = ['id']
     column_filters = ['roles', 'nickname', 'is_banned']
     column_editable_list = ['is_banned', 'ban_reason']
     can_view_details = True
     can_delete = False
     can_create = False
+    can_edit = False
     page_size = 10
 
     
@@ -47,3 +46,14 @@ class CommentModerModelView(ModerMixin):
     column_searchable_list = ['text', 'written_at']
     column_filters = ['creator.nickname', 'parent_discussion.theme', 'anonymous']
     page_size = 10
+
+class TagModerModelView(ModerMixin):
+    form_create_rules = ['parent_section', 'name']
+    form_edit_rules = ['parent_section', 'name']
+
+class DiscussionModerModelView(ModerMixin):
+    can_create = False
+    can_edit = False
+    can_delete = False
+    can_view_details = True
+    column_editable_list = ['tags']

@@ -50,8 +50,10 @@
  - implement search possibility
  - rebuild admin panel to moderators
 ------------------------------DONE-------------------------------
+ - implement gcp storage to save users pics
+
+ - implement email confirmation links
 
  - add pagination to needed pages - part done
-
 
  - implement bread crumbs feature
