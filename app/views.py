@@ -2,10 +2,20 @@ from flask import render_template, url_for, redirect, request, flash, abort
 from app import app, cache
 from app.models import Section, Tag, Theme, Discussion, Comment, Image, User, Edit_request
 from flask_login import current_user, login_required, logout_user
-from app.forms import CreateDiscussionForm, CreateCommentForm, UpdateAccountForm, EditDiscussionForm
+from app.forms import CreateCommentForm, EditDiscussionForm
 from datetime import datetime as dt
 from functools import wraps
 from sqlalchemy import func
+
+from app.controllers.themes_controller import get_themes_from_section_slug
+from app.controllers.discussions_controller import get_discussions_from_theme_slug
+from app.controllers.discussions_controller import get_discussion
+from app.controllers.discussions_controller import create_discussion
+from app.controllers.discussions_controller import prepare_create_discussion_form
+from app.controllers.discussions_controller import get_discussions_from_tag
+from app.controllers.comment_controller import create_comment
+from app.controllers.user_controller import prepare_user_settings_form
+
 
 def is_owner_of_request(f):
     @wraps(f)
@@ -46,90 +56,75 @@ def get_tags():
 @app.route('/forum')
 @app.route('/')
 def index():
-    # get all sections
     sections = Section.query.limit(7).all()
 
     return render_template('forum/main_page.html', sections=sections, tags=get_tags(), title='Sections list')
 
 @app.route('/forum/<string:section_slug>')
 def themes_index(section_slug):
-    current_section = Section.get_from_slug(section_slug)
-    themes = current_section.themes
-
+    current_section, themes = get_themes_from_section_slug(section_slug)
+    
     return render_template('forum/themes.html', tags=get_tags(), themes=themes, section_slug=current_section.slug, title='Themes list')
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>')
 def discussions_index(section_slug, theme_slug):
-    current_section_id = Section.get_from_slug(section_slug).id
-    current_theme = Theme.get_current_theme(theme_slug, current_section_id)
-    discussions = current_theme.discussions
+    current_section_id, current_theme, discussions = get_discussions_from_theme_slug(section_slug, theme_slug)
     
     return render_template('forum/discussions.html', tags=get_tags(), discussions=discussions, section_slug=section_slug, theme_slug=current_theme.slug, title='Topics list')
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['GET'])
 def discussion(section_slug, theme_slug, discussion_id):
     form = CreateCommentForm()
-    current_discussion = Discussion.query.get_or_404(discussion_id)
-    section_slug, theme_slug = current_discussion.build_url()
-    comments = current_discussion.comments.order_by(Comment.written_at.desc())
+    current_discussion, section_slug, theme_slug, comments = get_discussion(section_slug, theme_slug, discussion_id)
 
-    return render_template('forum/discussion.html', tags=get_tags(), comments=comments, discussion=current_discussion, title=current_discussion.theme, section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form)
+    return render_template('forum/discussion.html', tags=get_tags(),
+                                                    comments=comments,
+                                                    discussion=current_discussion,
+                                                    title=current_discussion.theme,
+                                                    section_slug=section_slug,
+                                                    theme_slug=theme_slug,
+                                                    discussion_id=discussion_id,
+                                                    form=form)
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['POST'])
 @login_required
 def create_comment(section_slug, theme_slug, discussion_id):
     form = CreateCommentForm()
 
-    if form.validate_on_submit():
-        text = form.text.data
-        anonymous = form.anonymous.data
-        comment = Comment(text, discussion_id, current_user.id, anonymous)
-        comment.save()
+    if form.validate_on_submit() and create_comment(form, discussion_id):
         flash('Comment created successfully', 'success')
-
+    else:
+        flash('Something went wrong, try one more time or later', 'error')
 
     return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id, form=form))
 
 # CREATE NEW TOPIC
-@app.route('/forum/<string:section_slug>/<string:theme_slug>/new', methods=['GET', 'POST'])
+@app.route('/forum/<string:section_slug>/<string:theme_slug>/new', methods=['POST'])
 @login_required
 def create_topic(section_slug, theme_slug):
     form = CreateDiscussionForm()
 
-    if request.method == "POST" and form.validate_on_submit():
-        theme = form.theme.data
-        text = form.text.data
-        theme_id = form.theme_id.data
-        tags = form.tags.data
-        creator_id = current_user.id
-
-        topic = Discussion(theme, text, theme_id, creator_id)
-        topic.tags = [Tag.query.filter(Tag.id==tag_id).first_or_404() for tag_id in tags]
-        topic.save()
-
+    if form.validate_on_submit():
+        discussion_id = create_discussion(form, current_user.id)
         flash('Topic created successfully', 'success')
-        return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=topic.id ))
+        return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id))
+    else:
+        flash('Some problem while creating topic', 'error')
+        return redirect(url_for('index'))
 
-    #gather all needed data
-    section_id = Section.get_from_slug(section_slug).id
-    theme_id = Theme.get_current_theme(theme_slug, section_id).id
-    tags = Tag.query.filter(Tag.section_id==section_id).all()
 
-    # sets pregathered data
-    form.theme_id.data = theme_id
-    form.tags.data = [(tag.id, tag.name) for tag in tags]
+# SHOW CREATE FORM
+@app.route('/forum/<string:section_slug>/<string:theme_slug>/new', methods=['GET'])
+@login_required
+def create_topic_form(section_slug, theme_slug):
+    form = prepare_create_discussion_form(section_slug, theme_slug)
 
     return render_template('forum/create_discussion.html', title='New topic', form=form, section_slug=section_slug, theme_slug=theme_slug)
 
 @app.route('/user/settings', methods=['GET'])
 @login_required
 def user_settings():
-    form = UpdateAccountForm()
-    form.nickname.data = current_user.nickname
-    form.website.data = current_user.website
-    form.about.data = current_user.about
-    email = current_user.email
-    last_seen = current_user.last_seen
+    form, email, last_seen = prepare_user_settings_form(current_user)
 
     return render_template('user/user_settings.html', tags=get_tags(), form=form, email=email, last_seen=last_seen)
 
@@ -138,21 +133,10 @@ def user_settings():
 @login_required
 def update_user():
     form = UpdateAccountForm()
-    if form.validate_on_submit():
-        current_user.nickname = form.nickname.data
-        current_user.website = form.website.data
-        current_user.about = form.about.data
-
-        if form.image.data:
-            img = Image(current_user.id, form.image.data)
-            img.save()
-
-        try:
-            current_user.save()
-        except:
-            flash('Something went wrong :(', 'error')
-        else:
-            flash('Your account updated successfully', 'success')
+    if form.validate_on_submit() and save_user_settings(form, current_user):
+        flash('Your account updated successfully', 'success')
+    else:
+        flash('Something went wrong :(', 'error')
 
     return redirect(url_for('user_settings'))
 
@@ -165,20 +149,12 @@ def user_profile(user_id):
 
 @app.route('/forum/tag/<string:tag_slug>', methods=['GET'])
 def tags_discussions(tag_slug):
-    tag = Tag.query.filter_by(slug=tag_slug).first_or_404()
-    all_themes = tag.parent_section.themes.all()
+    discussions_with_tag, tag_name, section_slug = get_discussions_from_tag(tag_slug)
 
-    all_discussions = list()
-    for theme in all_themes:
-        [all_discussions.append(discussion) for discussion in theme.discussions]
-
-    discussions_with_tag = list()
-    for discussion in all_discussions:
-        for d_tag in discussion.tags:
-            if d_tag.slug == tag_slug:
-                discussions_with_tag.append(discussion)
-
-    return render_template('forum/tags_discussions.html', tags=get_tags(), discussions=discussions_with_tag, tag_name=tag.name, section_slug=tag.parent_section.slug)
+    return render_template('forum/tags_discussions.html', tags=get_tags(),
+                                                        discussions=discussions_with_tag,
+                                                        tag_name=tag_name,
+                                                        section_slug=section_slug)
 
 @app.route('/forum/search', methods=['GET'])
 def search():
