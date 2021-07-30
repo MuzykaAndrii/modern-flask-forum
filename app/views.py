@@ -15,6 +15,7 @@ from app.controllers.discussions_controller import prepare_create_discussion_for
 from app.controllers.discussions_controller import get_discussions_from_tag
 from app.controllers.comment_controller import create_comment
 from app.controllers.user_controller import prepare_user_settings_form
+from app.controllers.search_controller import search_discussions
 
 
 def is_owner_of_request(f):
@@ -158,11 +159,7 @@ def tags_discussions(tag_slug):
 
 @app.route('/forum/search', methods=['GET'])
 def search():
-    page = request.args.get('page', 1, type=int)
-    search_query = request.args.get('search_query')
-    search_query = f'%{search_query}%'
-    discussions = Discussion.query.filter(Discussion.theme.ilike(search_query) | 
-                            Discussion.text.ilike(search_query) | Discussion.tags.any(Tag.name.ilike(search_query))).paginate(page=page, per_page=app.config['TOPICS_PER_PAGE'])
+    discussions = search_discussions(request)
 
     return render_template('forum/search.html', posts=discussions, tags=get_tags())
 
