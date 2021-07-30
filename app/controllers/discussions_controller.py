@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from typing import List
 
 from app.models import Section
 from app.models import Theme
@@ -8,7 +9,7 @@ from app.models import Tag
 from app.forms import CreateDiscussionForm
 
 
-def get_discussions_from_theme_slug(section_slug: str, theme_slug: str) -> (int, Theme, list):
+def get_discussions_from_theme_slug(section_slug: str, theme_slug: str) -> (int, Theme, List[Discussion]):
     """
     Validates url params, after fetch all discussions from theme
     """
@@ -19,7 +20,7 @@ def get_discussions_from_theme_slug(section_slug: str, theme_slug: str) -> (int,
 
     return current_section_id, current_theme, discussions
 
-def get_discussions_from_tag(tag_slug: str) -> (list, str, str):
+def get_discussions_from_tag(tag_slug: str) -> (List[Discussion], str, str):
     """
     Return all discussions with certain tag with tag name and section slug
     """
@@ -38,7 +39,7 @@ def get_discussions_from_tag(tag_slug: str) -> (list, str, str):
     
     return discussions_with_tag, tag.name, tag.parent_section.slug
 
-def get_discussion(section_slug: str, theme_slug: str, discussion_id: int) -> (Discussion, str, str, list):
+def get_discussion(section_slug: str, theme_slug: str, discussion_id: int) -> (Discussion, str, str, List[Comment]):
     """
     Validates url params and fetch certain discussion with comments
     """
