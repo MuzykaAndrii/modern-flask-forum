@@ -1,9 +1,13 @@
 from flask_wtf import FlaskForm
 from datetime import datetime
+from flask import Request
+from typing import List
+from sqlalchemy import func
 
 from app.forms import UpdateAccountForm
 from app.models import User
 from app.models import Image
+from app import app
 
 
 def prepare_user_settings_form(user: User) -> (FlaskForm, str, datetime):
@@ -38,3 +42,16 @@ def save_user_settings(form: FlaskForm, user: User) -> bool:
         return False
     else:
         return True
+
+def get_popular_users(request: Request) -> List[User]:
+    """
+    Return list of most popular users
+    """
+    page = request.args.get('page', 1, type=int)
+
+    users = User.query.join(User.created_comments).\
+                        group_by(User.id).\
+                        order_by(func.count().desc()).\
+                        paginate(page=page, per_page=app.config['USERS_PER_PAGE'])
+    
+    return users

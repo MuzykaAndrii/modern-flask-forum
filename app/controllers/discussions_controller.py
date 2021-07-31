@@ -1,5 +1,7 @@
 from flask_wtf import FlaskForm
+from flask import Request
 from typing import List
+from sqlalchemy import func
 
 from app.models import Section
 from app.models import Theme
@@ -7,6 +9,7 @@ from app.models import Discussion
 from app.models import Comment
 from app.models import Tag
 from app.forms import CreateDiscussionForm
+from app import app
 
 
 def get_discussions_from_theme_slug(section_slug: str, theme_slug: str) -> (int, Theme, List[Discussion]):
@@ -69,7 +72,7 @@ def create_discussion(form: FlaskForm, creator_id: int) -> bool:
     else:
         return topic.id
 
-def prepare_create_discussion_form(form: FlaskForm, section_slug: str, theme_slug: str) -> FlaskForm:
+def prepare_create_discussion_form(section_slug: str, theme_slug: str) -> FlaskForm:
     """
     Generates tags and theme_id for create discussion form
     """
@@ -85,3 +88,16 @@ def prepare_create_discussion_form(form: FlaskForm, section_slug: str, theme_slu
     form.tags.data = [(tag.id, tag.name) for tag in tags]
 
     return form
+
+def get_popular_discussions(request: Request) -> List[Discussion]:
+    """
+    Return most popular discussion
+    """
+    page = request.args.get('page', 1, type=int)
+
+    discussions = Discussion.query.join(Discussion.comments).\
+                        group_by(Discussion.id).\
+                        order_by(func.count().desc()).\
+                        paginate(page=page, per_page=app.config['BESTS_PER_PAGE'])
+    
+    return discussions

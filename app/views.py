@@ -4,8 +4,6 @@ from app.models import Section, Tag, Theme, Discussion, Comment, Image, User, Ed
 from flask_login import current_user, login_required, logout_user
 from app.forms import CreateCommentForm, EditDiscussionForm
 from datetime import datetime as dt
-from functools import wraps
-from sqlalchemy import func
 
 from app.controllers.themes_controller import get_themes_from_section_slug
 from app.controllers.discussions_controller import get_discussions_from_theme_slug
@@ -13,19 +11,19 @@ from app.controllers.discussions_controller import get_discussion
 from app.controllers.discussions_controller import create_discussion
 from app.controllers.discussions_controller import prepare_create_discussion_form
 from app.controllers.discussions_controller import get_discussions_from_tag
+from app.controllers.discussions_controller import get_popular_discussions
 from app.controllers.comment_controller import create_comment
 from app.controllers.user_controller import prepare_user_settings_form
+from app.controllers.user_controller import get_popular_users
 from app.controllers.search_controller import search_discussions
-
-
-def is_owner_of_request(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        edit_request = Edit_request.query.get_or_404(kwargs['request_id'])
-        if current_user.id != edit_request.target_discussion.creator_id:
-            abort(403)
-        return f(*args, **kwargs)
-    return decorated_function
+from app.controllers.edit_request_controller import prepare_edit_discussion_page
+from app.controllers.edit_request_controller import add_edit_request
+from app.controllers.edit_request_controller import get_input_edit_requests
+from app.controllers.edit_request_controller import get_edit_request
+from app.controllers.edit_request_controller import accept_request
+from app.controllers.edit_request_controller import discard_request
+from app.controllers.edit_request_controller import sended_edit_request_history
+from app.controllers.utils import is_owner_of_request
 
 @app.before_request
 def update_last_seen():
@@ -166,44 +164,35 @@ def search():
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>/edit_request', methods=['GET'])
 @login_required
 def edit_discussion(section_slug, theme_slug, discussion_id):
-    current_discussion = Discussion.query.get_or_404(discussion_id)
-    section_slug, theme_slug = current_discussion.build_url()
+    current_discussion, form, section_slug, theme_slug = prepare_edit_discussion_page(discussion_id)
 
-    form = EditDiscussionForm()
-    form.text.data = current_discussion.text
-
-    return render_template('forum/edit/create_edit_request.html', form=form, discussion=current_discussion, section_slug=section_slug, theme_slug=theme_slug)
+    return render_template('forum/edit/create_edit_request.html', form=form,
+                                                                discussion=current_discussion,
+                                                                section_slug=section_slug,
+                                                                theme_slug=theme_slug)
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>/edit_request', methods=['POST'])
 @login_required
 def save_edit_request(section_slug, theme_slug, discussion_id):
-    current_discussion = Discussion.query.get_or_404(discussion_id)
-    section_slug, theme_slug = current_discussion.build_url()
-
     form = EditDiscussionForm()
-    if form.validate_on_submit():
-        edit_request = Edit_request(form.text.data, current_discussion.id, current_user.id)
-        try:
-            edit_request.save()
-        except:
-            flash('Something went wrong', 'error')
-
+    if form.validate_on_submit() and add_edit_request(discussion_id, current_user.id, form):
         flash('Your edit request successfully sended!', 'success')
+    else:
+        flash('Something went wrong', 'error')
 
-    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=current_discussion.id))
+    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id))
 
 @app.route('/user/edit_requests')
 @login_required
 def edit_requests_index():
-    discussions = current_user.created_discussions.filter(Discussion.edit_requests.any(Edit_request.is_validated==None)).all()
+    discussions = get_input_edit_requests(current_user)
 
     return render_template('forum/edit/edit_requests.html', tags=get_tags(), discussions=discussions)
 
 @app.route('/user/edit_request/<int:request_id>', methods=['GET'])
 @login_required
 def edit_request(request_id):
-    edit_request = Edit_request.query.get(request_id)
-    discussion = edit_request.target_discussion
+    edit_request, discussion = get_edit_request(request_id)
 
     return render_template('forum/edit/edit_request.html', edit=edit_request, original=discussion)
 
@@ -211,61 +200,37 @@ def edit_request(request_id):
 @login_required
 @is_owner_of_request
 def submit_request(request_id):
-    edit_request = Edit_request.query.get_or_404(request_id)
-    discussion = edit_request.target_discussion
-    discussion.text = edit_request.text
-
-    edit_request.is_validated = True
-    discussion.save()
-    edit_request.save()
-
+    section_slug, theme_slug, discussion_id = accept_request(request_id)
 
     flash('Discussion successfully updated!', 'success')
-    section_slug, theme_slug = discussion.build_url()
-    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion.id))
+    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id))
 
 @app.route('/user/edit_request/<int:request_id>/deny', methods=['POST', 'GET'])
 @login_required
 @is_owner_of_request
 def deny_request(request_id):
-    edit_request = Edit_request.query.get_or_404(request_id)
-    edit_request.is_validated = False
-    edit_request.save()
+    section_slug, theme_slug, discussion_id = discard_request(request_id)
 
-    section_slug, theme_slug = edit_request.target_discussion.build_url()
     flash('Edit request successfully denied', 'success')
-
-    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=edit_request.target_id))
+    return redirect(url_for('discussion', section_slug=section_slug, theme_slug=theme_slug, discussion_id=discussion_id))
 
 @app.route('/user/edit_requests/stats', methods=['GET'])
 def edit_requests_stat():
-    reqs = current_user.edit_requests.order_by(Edit_request.id.desc())
-    stat = current_user.get_request_stats()
+    requests, stat = sended_edit_request_history(current_user)
 
-    return render_template('forum/edit/edit_stats.html', stat=stat, requests=reqs.all(), tags=get_tags())
+    return render_template('forum/edit/edit_stats.html', stat=stat, requests=requests, tags=get_tags())
 
 
 @cache.cached(timeout=120)
 @app.route('/forum/users')
 def list_users():
-    page = request.args.get('page', 1, type=int)
-
-    users = User.query.join(User.created_comments).\
-                        group_by(User.id).\
-                        order_by(func.count().desc()).\
-                        paginate(page=page, per_page=app.config['USERS_PER_PAGE'])
-    
+    users = get_popular_users(request)
 
     return render_template('user/users.html', users=users, tags=get_tags())
 
 @cache.cached(timeout=120)
 @app.route('/forum/popular_topics')
 def hot_topics():
-    page = request.args.get('page', 1, type=int)
-
-    discussions = Discussion.query.join(Discussion.comments).\
-                        group_by(Discussion.id).\
-                        order_by(func.count().desc()).\
-                        paginate(page=page, per_page=app.config['BESTS_PER_PAGE'])
+    discussions = get_popular_discussions(request)
 
     return render_template('forum/best_discussions.html', discussions=discussions, tags=get_tags())
