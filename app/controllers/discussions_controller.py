@@ -25,20 +25,10 @@ def get_discussions_from_theme_slug(section_slug: str, theme_slug: str) -> (int,
 
 def get_discussions_from_tag(tag_slug: str) -> (List[Discussion], str, str):
     """
-    Return all discussions with certain tag with tag name and section slug
+    Return all discussions with certain tag, returns tag name and section slug
     """
-    tag = Tag.query.filter_by(slug=tag_slug).first_or_404()
-    all_themes = tag.parent_section.themes.all()
-
-    all_discussions = list()
-    for theme in all_themes:
-        [all_discussions.append(discussion) for discussion in theme.discussions]
-
-    discussions_with_tag = list()
-    for discussion in all_discussions:
-        for d_tag in discussion.tags:
-            if d_tag.slug == tag_slug:
-                discussions_with_tag.append(discussion)
+    tag = Tag.query.filter_by(slug=tag_slug).first_or_404()    
+    discussions_with_tag = tag.discussions.all()
     
     return discussions_with_tag, tag.name, tag.parent_section.slug
 

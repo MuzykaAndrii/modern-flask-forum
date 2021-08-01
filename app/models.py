@@ -190,8 +190,7 @@ class Discussion(DbMixin, db.Model):
     # field needed to link this model with parent section
     theme_id = db.Column(db.Integer, db.ForeignKey('theme.id'), nullable=False)
 
-    #
-    # tags prop, reference to future tag model
+    # tags prop, reference to tag model
     tags = db.relationship('Tag', secondary=discussion_tags, backref=db.backref('discussions', lazy='dynamic'))
 
     # comments prop, bound with next model primary key
