@@ -42,9 +42,10 @@ def get_input_edit_requests(user: User) -> (List[Discussion], List[Edit_request]
     """
     Return all not validated input requests
     """
-    not_validated_edit_requests = Edit_request.query.filter(Edit_request.is_validated==None,
-                                                            Edit_request.target_id.\
-                                                            in_(map(lambda discussion: discussion.id, Discussion.query.filter_by(creator_id=user.id))))
+    not_validated_edit_requests = Edit_request.query.filter(Edit_request.target_id==Discussion.id,
+                                                            Discussion.creator_id==user.id,
+                                                            Edit_request.is_validated==None)
+
     discussions = {request.target_discussion for request in not_validated_edit_requests}
 
     return discussions, not_validated_edit_requests
