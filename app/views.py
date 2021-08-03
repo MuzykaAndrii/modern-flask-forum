@@ -61,9 +61,9 @@ def index():
 
 @app.route('/forum/<string:section_slug>')
 def themes_index(section_slug):
-    current_section, themes = get_themes_from_section_slug(section_slug)
+    section_slug, themes = get_themes_from_section_slug(section_slug)
     
-    return render_template('forum/themes.html', tags=get_tags(), themes=themes, section_slug=current_section.slug, title='Themes list')
+    return render_template('forum/themes.html', tags=get_tags(), themes=themes, section_slug=section_slug, title='Themes list')
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>')
 def discussions_index(section_slug, theme_slug):

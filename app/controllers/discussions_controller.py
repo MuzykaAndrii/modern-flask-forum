@@ -16,7 +16,7 @@ def get_discussions_from_theme_slug(section_slug: str, theme_slug: str) -> (int,
     """
     Validates url params, after fetch all discussions from theme
     """
-    current_section_id = Section.get_from_slug(section_slug).id
+    current_section_id = Section.query.with_entities(Section.id).filter_by(slug=section_slug).first_or_404()[0]
     current_theme = Theme.get_current_theme(theme_slug, current_section_id)
     discussions = current_theme.discussions
 
@@ -65,9 +65,9 @@ def prepare_create_discussion_form(section_slug: str, theme_slug: str) -> FlaskF
     """
     Generates tags and theme_id for create discussion form
     """
-    #gather gather section and theme
-    section_id = Section.get_from_slug(section_slug).id
-    theme_id = Theme.get_current_theme(theme_slug, section_id).id
+    #gather section and theme
+    section_id = Section.query.with_entities(Section.id).filter_by(slug=section_slug).first_or_404()[0]
+    theme_id = Theme.query.with_entities(Theme.id).filter(Theme.slug==theme_slug, Theme.section_id==section_id).first_or_404()[0]
     #gather tags
     tags = Tag.query.filter(Tag.section_id==section_id).all()
 

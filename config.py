@@ -43,6 +43,7 @@ class DevConfig(Config):
     CACHE_DIR = 'cache/'
     SECRET_KEY = 'SuperSecretString'
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'site.db'))
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
     
 
 class ProdConfig(Config):

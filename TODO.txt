@@ -49,11 +49,12 @@
     - change view
  - implement search possibility
  - rebuild admin panel to moderators
+ - implement email confirmation links
+ - add pagination to needed pages - part done
 ------------------------------DONE-------------------------------
  - implement gcp storage to save users pics
 
- - implement email confirmation links
-
- - add pagination to needed pages - part done
-
  - implement bread crumbs feature
+
+ - improve performance with "with_entities()" sqlalchemy method
+

@@ -54,7 +54,7 @@ def get_edit_request(edit_request_id: int) -> (Edit_request, Discussion):
     """
     Returns certain edit request with target discussion
     """
-    edit_request = Edit_request.query.get(edit_request_id)
+    edit_request = Edit_request.query.get_or_404(edit_request_id)
     discussion = edit_request.target_discussion
 
     return edit_request, discussion
