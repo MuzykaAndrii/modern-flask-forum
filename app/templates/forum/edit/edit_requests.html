@@ -20,8 +20,8 @@
                             <span style="margin-left: 10px;" class="badge rounded-pill bg-info text-white">{{ discussion.get_count_of_non_validated_requests() }}</span>
                     </a>
                     </h2>
-                    {% for req in discussion.edit_requests %}
-                    {% if req.is_validated == None %}
+                    {% for req in edit_requests %}
+                    {% if req.target_id == discussion.id %}
                     <div id="collapse{{discussion.id}}" class="accordion-collapse collapse" aria-labelledby="headingOne">
                         <div class="accordion-body">
                             <a href="{{ url_for('edit_request', request_id=req.id) }}">{{ req.text | striptags | truncate(200)}}</a>

@@ -1,4 +1,5 @@
 Production: https://modern-flask-forum.herokuapp.com/
+ER diagram: https://app.dbdesigner.net/designer/schema/404811
 
 # modern-flask-forum
 

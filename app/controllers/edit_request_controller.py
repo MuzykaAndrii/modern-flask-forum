@@ -38,15 +38,16 @@ def add_edit_request(discussion_id: int, user_id: int, form: FlaskForm) -> bool:
     else:
         return True
 
-def get_input_edit_requests(user: User) -> List[Edit_request]:
+def get_input_edit_requests(user: User) -> (List[Discussion], List[Edit_request]):
     """
     Return all not validated input requests
     """
-    # gets all user discussions if at least one is not validated
-    # need to optimize in future
-    discussions = user.created_discussions.filter(Discussion.edit_requests.any(Edit_request.is_validated==None)).all()
+    not_validated_edit_requests = Edit_request.query.filter(Edit_request.is_validated==None,
+                                                            Edit_request.target_id.\
+                                                            in_(map(lambda discussion: discussion.id, Discussion.query.filter_by(creator_id=user.id))))
+    discussions = {request.target_discussion for request in not_validated_edit_requests}
 
-    return discussions
+    return discussions, not_validated_edit_requests
 
 def get_edit_request(edit_request_id: int) -> (Edit_request, Discussion):
     """

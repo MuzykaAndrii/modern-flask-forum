@@ -185,9 +185,9 @@ def save_edit_request(section_slug, theme_slug, discussion_id):
 @app.route('/user/edit_requests')
 @login_required
 def edit_requests_index():
-    discussions = get_input_edit_requests(current_user)
+    discussions, edit_requests = get_input_edit_requests(current_user)
 
-    return render_template('forum/edit/edit_requests.html', tags=get_tags(), discussions=discussions)
+    return render_template('forum/edit/edit_requests.html', tags=get_tags(), discussions=discussions, edit_requests=edit_requests)
 
 @app.route('/user/edit_request/<int:request_id>', methods=['GET'])
 @login_required

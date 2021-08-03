@@ -16,7 +16,6 @@ def get_discussions_from_theme_slug(section_slug: str, theme_slug: str) -> (int,
     """
     Validates url params, after fetch all discussions from theme
     """
-
     current_section_id = Section.get_from_slug(section_slug).id
     current_theme = Theme.get_current_theme(theme_slug, current_section_id)
     discussions = current_theme.discussions
