@@ -8,28 +8,24 @@ from app.forms import EditDiscussionForm
 
 UrlParams = (str, str, int)
 
-def prepare_edit_discussion_page(discussion_id: int) -> (Discussion, FlaskForm, str, str):
+def prepare_edit_discussion_page(discussion_id: int) -> (Discussion, FlaskForm):
     """
     Validates url params and generate fields in discussion edit form
     """
     current_discussion = Discussion.query.get_or_404(discussion_id)
-    section_slug, theme_slug = current_discussion.build_url()
 
     form = EditDiscussionForm()
     form.text.data = current_discussion.text
 
-    return current_discussion, form, section_slug, theme_slug
+    return current_discussion, form
 
-def add_edit_request(discussion_id: int, user_id: int, form: FlaskForm) -> bool:
+def add_edit_request(target_id: int, user_id: int, form: FlaskForm) -> bool:
     """
-    Validates url params and save edit request
+    Saves edit request
     """
-    current_discussion = Discussion.query.get_or_404(discussion_id)
-    section_slug, theme_slug = current_discussion.build_url()
-
     edit_request_text = form.text.data
-    target_id = current_discussion.id
     edit_request = Edit_request(edit_request_text, target_id, user_id)
+
     try:
         edit_request.save()
     except Exception as e:
@@ -72,6 +68,7 @@ def accept_request(edit_request_id: int) -> UrlParams:
     discussion.save()
     edit_request.save()
 
+    # returning url params, need to fix in future
     section_slug, theme_slug = discussion.build_url()
 
     return section_slug, theme_slug, discussion.id
@@ -84,6 +81,7 @@ def discard_request(edit_request_id: int) -> UrlParams:
     edit_request.is_validated = False
     edit_request.save()
 
+    # returning url params, need to fix in future
     section_slug, theme_slug = edit_request.target_discussion.build_url()
 
     return section_slug, theme_slug, edit_request.target_id

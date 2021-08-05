@@ -4,7 +4,7 @@ from flask_login import current_user
 from app.models import Comment
 
 
-def create_comment(form: FlaskForm, discussion_id: int) -> bool:
+def save_comment(form: FlaskForm, discussion_id: int) -> bool:
     """
     Creates user comment for certain discussion
     """

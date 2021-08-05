@@ -12,7 +12,7 @@ from app.controllers.discussions_controller import create_discussion
 from app.controllers.discussions_controller import prepare_create_discussion_form
 from app.controllers.discussions_controller import get_discussions_from_tag
 from app.controllers.discussions_controller import get_popular_discussions
-from app.controllers.comment_controller import create_comment
+from app.controllers.comment_controller import save_comment
 from app.controllers.user_controller import prepare_user_settings_form
 from app.controllers.user_controller import get_popular_users
 from app.controllers.search_controller import search_discussions
@@ -71,30 +71,29 @@ def themes_index(section_slug):
 @validate_url
 def discussions_index(section_slug, theme_slug):
     discussions = get_discussions_from_theme_slug(theme_slug)
-    #change title
-    return render_template('forum/discussions.html', tags=get_tags(), discussions=discussions, section_slug=section_slug, theme_slug=theme_slug, title='Topics list')
+
+    return render_template('forum/discussions.html', tags=get_tags(), discussions=discussions, section_slug=section_slug, theme_slug=theme_slug)
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['GET'])
 @validate_url
 def discussion(section_slug, theme_slug, discussion_id):
     form = CreateCommentForm()
-    current_discussion, section_slug, theme_slug, comments = get_discussion(section_slug, theme_slug, discussion_id)
+    current_discussion, comments = get_discussion(discussion_id)
 
     return render_template('forum/discussion.html', tags=get_tags(),
                                                     comments=comments,
                                                     discussion=current_discussion,
-                                                    title=current_discussion.theme,
                                                     section_slug=section_slug,
                                                     theme_slug=theme_slug,
-                                                    discussion_id=discussion_id,
                                                     form=form)
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['POST'])
 @login_required
+@validate_url
 def create_comment(section_slug, theme_slug, discussion_id):
     form = CreateCommentForm()
 
-    if form.validate_on_submit() and create_comment(form, discussion_id):
+    if form.validate_on_submit() and save_comment(form, discussion_id):
         flash('Comment created successfully', 'success')
     else:
         flash('Something went wrong, try one more time or later', 'error')
@@ -104,6 +103,7 @@ def create_comment(section_slug, theme_slug, discussion_id):
 # CREATE NEW TOPIC
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/new', methods=['POST'])
 @login_required
+@validate_url
 def create_topic(section_slug, theme_slug):
     form = CreateDiscussionForm()
 
@@ -119,8 +119,9 @@ def create_topic(section_slug, theme_slug):
 # SHOW CREATE FORM
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/new', methods=['GET'])
 @login_required
+@validate_url
 def create_topic_form(section_slug, theme_slug):
-    form = prepare_create_discussion_form(section_slug, theme_slug)
+    form = prepare_create_discussion_form(theme_slug)
 
     return render_template('forum/create_discussion.html', title='New topic', form=form, section_slug=section_slug, theme_slug=theme_slug)
 
@@ -167,8 +168,9 @@ def search():
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>/edit_request', methods=['GET'])
 @login_required
+@validate_url
 def edit_discussion(section_slug, theme_slug, discussion_id):
-    current_discussion, form, section_slug, theme_slug = prepare_edit_discussion_page(discussion_id)
+    current_discussion, form, = prepare_edit_discussion_page(discussion_id)
 
     return render_template('forum/edit/create_edit_request.html', form=form,
                                                                 discussion=current_discussion,
@@ -177,6 +179,7 @@ def edit_discussion(section_slug, theme_slug, discussion_id):
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>/edit_request', methods=['POST'])
 @login_required
+@validate_url
 def save_edit_request(section_slug, theme_slug, discussion_id):
     form = EditDiscussionForm()
     if form.validate_on_submit() and add_edit_request(discussion_id, current_user.id, form):

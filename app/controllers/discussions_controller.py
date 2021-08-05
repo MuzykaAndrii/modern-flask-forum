@@ -30,16 +30,14 @@ def get_discussions_from_tag(tag_slug: str) -> (List[Discussion], str, str):
     
     return discussions_with_tag, tag.name, tag.parent_section.slug
 
-def get_discussion(section_slug: str, theme_slug: str, discussion_id: int) -> (Discussion, str, str, List[Comment]):
+def get_discussion(discussion_id: int) -> (Discussion, List[Comment]):
     """
     Validates url params and fetch certain discussion with comments
     """
-
     current_discussion = Discussion.query.get_or_404(discussion_id)
-    section_slug, theme_slug = current_discussion.build_url()
     comments = current_discussion.comments.order_by(Comment.written_at.desc())
     
-    return current_discussion, section_slug, theme_slug, comments
+    return current_discussion, comments
 
 def create_discussion(form: FlaskForm, creator_id: int) -> bool:
     """
@@ -60,15 +58,14 @@ def create_discussion(form: FlaskForm, creator_id: int) -> bool:
     else:
         return topic.id
 
-def prepare_create_discussion_form(section_slug: str, theme_slug: str) -> FlaskForm:
+def prepare_create_discussion_form(theme_slug: str) -> FlaskForm:
     """
     Generates tags and theme_id for create discussion form
     """
-    #gather section and theme
-    section_id = Section.query.with_entities(Section.id).filter_by(slug=section_slug).first_or_404()[0]
-    theme_id = Theme.query.with_entities(Theme.id).filter(Theme.slug==theme_slug, Theme.section_id==section_id).first_or_404()[0]
+    #gather section id and theme id
+    theme_id, section_id = Theme.query.with_entities(Theme.id, Theme.section_id).filter_by(slug=theme_slug).first()
     #gather tags
-    tags = Tag.query.filter(Tag.section_id==section_id).all()
+    tags = Tag.query.filter_by(section_id=section_id).all()
 
     # sets tags and theme id to form
     form = CreateDiscussionForm()
