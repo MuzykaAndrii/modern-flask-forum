@@ -10,9 +10,11 @@ from app.models import Comment
 from app.models import Tag
 from app.forms import CreateDiscussionForm
 from app import app
+from app.controllers.utils import validate_url
 
 
-def get_discussions_from_theme_slug(section_slug: str, theme_slug: str) -> (int, Theme, List[Discussion]):
+@validate_url
+def get_discussions_from_theme_slug(section_slug: str, theme_slug: str) -> (Theme, List[Discussion]):
     """
     Validates url params, after fetch all discussions from theme
     """
@@ -20,7 +22,7 @@ def get_discussions_from_theme_slug(section_slug: str, theme_slug: str) -> (int,
     current_theme = Theme.get_current_theme(theme_slug, current_section_id)
     discussions = current_theme.discussions
 
-    return current_section_id, current_theme, discussions
+    return current_theme, discussions
 
 def get_discussions_from_tag(tag_slug: str) -> (List[Discussion], str, str):
     """
@@ -31,6 +33,7 @@ def get_discussions_from_tag(tag_slug: str) -> (List[Discussion], str, str):
     
     return discussions_with_tag, tag.name, tag.parent_section.slug
 
+@validate_url
 def get_discussion(section_slug: str, theme_slug: str, discussion_id: int) -> (Discussion, str, str, List[Comment]):
     """
     Validates url params and fetch certain discussion with comments
