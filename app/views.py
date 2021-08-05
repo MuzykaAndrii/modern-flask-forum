@@ -24,6 +24,7 @@ from app.controllers.edit_request_controller import accept_request
 from app.controllers.edit_request_controller import discard_request
 from app.controllers.edit_request_controller import sended_edit_request_history
 from app.controllers.utils import is_owner_of_request
+from app.controllers.utils import validate_url
 
 @app.before_request
 def update_last_seen():
@@ -60,18 +61,21 @@ def index():
     return render_template('forum/main_page.html', sections=sections, tags=get_tags(), title='Sections list')
 
 @app.route('/forum/<string:section_slug>')
+@validate_url
 def themes_index(section_slug):
     themes = get_themes_from_section_slug(section_slug)
     
     return render_template('forum/themes.html', tags=get_tags(), themes=themes, section_slug=section_slug)
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>')
+@validate_url
 def discussions_index(section_slug, theme_slug):
-    current_theme, discussions = get_discussions_from_theme_slug(section_slug, theme_slug)
-    
-    return render_template('forum/discussions.html', tags=get_tags(), discussions=discussions, section_slug=section_slug, theme_slug=current_theme.slug, title='Topics list')
+    discussions = get_discussions_from_theme_slug(theme_slug)
+    #change title
+    return render_template('forum/discussions.html', tags=get_tags(), discussions=discussions, section_slug=section_slug, theme_slug=theme_slug, title='Topics list')
 
 @app.route('/forum/<string:section_slug>/<string:theme_slug>/<int:discussion_id>', methods=['GET'])
+@validate_url
 def discussion(section_slug, theme_slug, discussion_id):
     form = CreateCommentForm()
     current_discussion, section_slug, theme_slug, comments = get_discussion(section_slug, theme_slug, discussion_id)

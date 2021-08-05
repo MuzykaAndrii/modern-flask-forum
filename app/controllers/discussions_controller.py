@@ -10,30 +10,26 @@ from app.models import Comment
 from app.models import Tag
 from app.forms import CreateDiscussionForm
 from app import app
-from app.controllers.utils import validate_url
 
 
-@validate_url
-def get_discussions_from_theme_slug(section_slug: str, theme_slug: str) -> (Theme, List[Discussion]):
+def get_discussions_from_theme_slug(theme_slug: str) -> List[Discussion]:
     """
-    Validates url params, after fetch all discussions from theme
+    Fetch all discussions from theme slug
     """
-    current_section_id = Section.query.with_entities(Section.id).filter_by(slug=section_slug).first_or_404()[0]
-    current_theme = Theme.get_current_theme(theme_slug, current_section_id)
-    discussions = current_theme.discussions
+    discussions = Discussion.query.filter(Discussion.theme_id==Theme.id, Theme.slug==theme_slug)
 
-    return current_theme, discussions
+    return discussions
 
 def get_discussions_from_tag(tag_slug: str) -> (List[Discussion], str, str):
     """
     Return all discussions with certain tag, returns tag name and section slug
+    Need to optimize by join expression
     """
     tag = Tag.query.filter_by(slug=tag_slug).first_or_404()    
     discussions_with_tag = tag.discussions.all()
     
     return discussions_with_tag, tag.name, tag.parent_section.slug
 
-@validate_url
 def get_discussion(section_slug: str, theme_slug: str, discussion_id: int) -> (Discussion, str, str, List[Comment]):
     """
     Validates url params and fetch certain discussion with comments

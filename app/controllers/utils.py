@@ -33,23 +33,17 @@ def validate_url(f):
     """
     @wraps(f)
     def decorated(*args, **kwargs):
-        params = {'section_slug': '', 'theme_slug': '', 'discussion_id': ''}
-        try:
-            params['section_slug'] = args[0]
-            params['theme_slug'] = args[1]
-            params['discussion_id'] = args[2]
-        except:
-            pass
+        url_params = kwargs
 
-        if params['section_slug']:
-            section_id = Section.query.with_entities(Section.id).filter_by(slug=params['section_slug']).first_or_404()[0]
+        if 'section_slug' in url_params:
+            section_id = Section.query.with_entities(Section.id).filter_by(slug=url_params['section_slug']).first_or_404()[0]
 
-        if params['theme_slug']:
-            theme_id = Theme.query.with_entities(Theme.id).filter(Theme.slug==params['theme_slug'],
+        if 'theme_slug' in url_params:
+            theme_id = Theme.query.with_entities(Theme.id).filter(Theme.slug==url_params['theme_slug'],
                                                                   Theme.section_id==section_id).first_or_404()[0]
 
-        if params['discussion_id']:
-            Discussion.query.with_entities(Discussion.id).filter(Discussion.id==params['discussion_id'],
+        if 'discussion_id' in url_params:
+            Discussion.query.with_entities(Discussion.id).filter(Discussion.id==url_params['discussion_id'],
                                                                  Discussion.theme_id==theme_id).first_or_404()
 
         return f(*args, **kwargs)
