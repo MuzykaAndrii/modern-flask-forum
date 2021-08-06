@@ -9,6 +9,7 @@ from utils.image_handler import *
 from slugify import slugify
 
 @login.user_loader
+@cache.memoize(timeout=60)
 def user_loader(user_id):
     return User.query.get(int(user_id))
 
@@ -95,13 +96,15 @@ class User(UserMixin, DbMixin, db.Model):
         self.hash_password(password)
     
     def get_request_stats(self):
-        reqs = self.edit_requests
-        success = reqs.filter(Edit_request.is_validated == True).count()
-        all_reqs = reqs.filter(Edit_request.is_validated == False).count()
-        if all_reqs > 0:
-            return round(success / all_reqs * 100 ,1)
+        success_requests = self.edit_requests.filter(Edit_request.is_validated == True).count()
+        failed_requests = self.edit_requests.filter(Edit_request.is_validated == False).count()
+        total_requests = success_requests + failed_requests
+
+        if total_requests:
+            return round(success_requests / total_requests * 100 ,1)
         else:
-            return False
+            return 'None'
+
 
     def hash_password(self, password):
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -149,10 +152,6 @@ class Section(DbMixin, db.Model):
     # saves all tags from this section
     tags = db.relationship('Tag', backref='parent_section', lazy='dynamic')
 
-    @staticmethod
-    def get_from_slug(slug):
-        return Section.query.filter_by(slug=slug).first_or_404()
-
     def __init__(self, name):
         self.name = name
         self.slug = Section.create_slug(name)
@@ -171,10 +170,6 @@ class Theme(DbMixin, db.Model):
 
     # discussions prop, bound with next model primary key
     discussions = db.relationship('Discussion', backref='parent_theme', lazy='dynamic')
-
-    @staticmethod
-    def get_current_theme(theme_slug, section_id):
-        return Theme.query.filter_by(slug=theme_slug, section_id=section_id).first_or_404()
 
     def __init__(self, name, section_id):
         self.name = name
@@ -206,14 +201,9 @@ class Discussion(DbMixin, db.Model):
 
     def get_last_comment_time(self):
         return self.comments.order_by(Comment.written_at.desc()).first().written_at.date()
-
-    @staticmethod
-    def get_current_discussion(theme_id, discussion_id):
-        return Discussion.query.filter_by(theme_id=theme_id, id=discussion_id).first_or_404()
     
     def get_count_of_non_validated_requests(self):
         return self.edit_requests.filter(Edit_request.is_validated==None).count()
-    
     
     def build_url(self):
         theme = self.parent_theme
