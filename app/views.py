@@ -49,7 +49,7 @@ def access_denied(e):
     # note that we set the 404 status explicitly
     return render_template('alerts/403.html', title='Accessless'), 403
 
-# @cache.cached(timeout=600, key_prefix='tags')
+@cache.cached(timeout=600, key_prefix='tags')
 def get_tags():
     return Tag.query.limit(25).all()
 

@@ -39,7 +39,7 @@ class Config:
 
 class DevConfig(Config):
     DEBUG = True
-    CACHE_TYPE = 'filesystem'
+    CACHE_TYPE = 'FileSystemCache'
     CACHE_DIR = 'cache/'
     SECRET_KEY = 'SuperSecretString'
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'site.db'))
