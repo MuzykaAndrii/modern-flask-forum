@@ -4,6 +4,7 @@ from datetime import datetime as dt
 from flask_login import UserMixin, current_user
 from app import login
 from app import bcrypt
+from app import cache
 from utils.image_handler import *
 from slugify import slugify
 
@@ -76,12 +77,13 @@ class User(UserMixin, DbMixin, db.Model):
     
     def last_comments(self):
         return self.created_comments.order_by(Comment.written_at.desc()).limit(5).all()
-    
+
+    @cache.cached(timeout=3600)
     def has_role(self, role):
-        for r in self.roles:
-            if r.name == role:
-                return True
-        return False
+        user_id = self.query.with_entities(User.id)
+        role = Role.query.with_entities(Role.id).join(users_roles).filter(users_roles.c.user_id==user_id, Role.name==role, Role.id==users_roles.c.role_id).first()
+
+        return role
 
     def get_avatars(self):
         if self.avatars:
