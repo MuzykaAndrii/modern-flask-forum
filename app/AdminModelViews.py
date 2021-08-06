@@ -5,11 +5,11 @@ from wtforms import PasswordField
 
 class MyAdminIndexView(AdminIndexView):
     def is_accessible(self):
-        return current_user.has_role('admin')
+        return current_user.is_authenticated and current_user.has_role('admin')
 
 class AdminAccess(ModelView):
     def is_accessible(self):
-        return current_user.has_role('admin')
+        return current_user.is_authenticated and current_user.has_role('admin')
 
 class AdminMixin(AdminAccess, ModelView):
     def on_model_change(self, form, model, is_created):

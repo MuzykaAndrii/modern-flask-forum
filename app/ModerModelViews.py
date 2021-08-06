@@ -5,7 +5,7 @@ from flask_login import current_user
 
 class MyModerIndexView(AdminIndexView):
     def is_accessible(self):
-        return current_user.has_role('moderator')
+        return current_user.is_authenticated and current_user.has_role('moderator')
 
 class ModerMixin(ModelView):
     def is_accessible(self):

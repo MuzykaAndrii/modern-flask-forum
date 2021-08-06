@@ -31,13 +31,23 @@ def update_last_seen():
     if current_user.is_authenticated:
         current_user.update_last_seen()
 
-@app.before_request
 @cache.cached(timeout=60)
+def is_current_user_banned():
+    is_banned, reason = current_user.query.with_entities(User.is_banned, User.ban_reason).first()
+    if is_banned:
+        return reason
+    else:
+        return False
+
+@app.before_request
 def check_banned():
-    if current_user.is_authenticated and current_user.is_banned == True:
-        ban_reason = current_user.ban_reason
+    if not current_user.is_authenticated:
+        return
+
+    result = is_current_user_banned()
+    if result:
         logout_user()
-        return render_template('alerts/banned.html', reason=ban_reason)
+        return render_template('alerts/banned.html', reason=result)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -51,7 +61,7 @@ def access_denied(e):
 
 @cache.cached(timeout=600, key_prefix='tags')
 def get_tags():
-    return Tag.query.limit(25).all()
+    return Tag.query.with_entities(Tag.slug, Tag.name).limit(25).all()
 
 @app.route('/forum')
 @app.route('/')
