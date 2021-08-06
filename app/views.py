@@ -49,7 +49,7 @@ def access_denied(e):
     # note that we set the 404 status explicitly
     return render_template('alerts/403.html', title='Accessless'), 403
 
-@cache.cached(timeout=600, key_prefix='tags')
+# @cache.cached(timeout=600, key_prefix='tags')
 def get_tags():
     return Tag.query.limit(25).all()
 
@@ -156,9 +156,9 @@ def tags_discussions(tag_slug):
     discussions_with_tag, tag_name, section_slug = get_discussions_from_tag(tag_slug)
 
     return render_template('forum/tags_discussions.html', tags=get_tags(),
-                                                        discussions=discussions_with_tag,
-                                                        tag_name=tag_name,
-                                                        section_slug=section_slug)
+                                                          discussions=discussions_with_tag,
+                                                          tag_name=tag_name,
+                                                          section_slug=section_slug)
 
 @app.route('/forum/search', methods=['GET'])
 def search():

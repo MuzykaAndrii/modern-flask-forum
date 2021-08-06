@@ -58,3 +58,4 @@
 
  - improve performance with "with_entities()" sqlalchemy method
 
+ - improve performance in all templates by tiny url generator

@@ -8,6 +8,7 @@ from app.models import Theme
 from app.models import Discussion
 from app.models import Comment
 from app.models import Tag
+from app.models import discussion_tags
 from app.forms import CreateDiscussionForm
 from app import app
 
@@ -23,12 +24,16 @@ def get_discussions_from_theme_slug(theme_slug: str) -> List[Discussion]:
 def get_discussions_from_tag(tag_slug: str) -> (List[Discussion], str, str):
     """
     Return all discussions with certain tag, returns tag name and section slug
-    Need to optimize by join expression
     """
-    tag = Tag.query.filter_by(slug=tag_slug).first_or_404()    
-    discussions_with_tag = tag.discussions.all()
+    tag_name, section_id = Tag.query.with_entities(Tag.name, Tag.section_id).filter_by(slug=tag_slug).first_or_404()
+    section_slug = Section.query.with_entities(Section.slug).filter_by(id=section_id).first()[0]
     
-    return discussions_with_tag, tag.name, tag.parent_section.slug
+    discussions_with_tag = Discussion.query.select_from(Tag).join(discussion_tags).\
+                                                              filter(Discussion.id==discussion_tags.c.discussion_id,
+                                                              Tag.id==discussion_tags.c.tag_id, Tag.slug==tag_slug)
+
+
+    return discussions_with_tag, tag_name, section_slug
 
 def get_discussion(discussion_id: int) -> (Discussion, List[Comment]):
     """
